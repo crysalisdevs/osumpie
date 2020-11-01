@@ -1,6 +1,6 @@
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:osumpie/globals.dart';
+import 'package:osumpie/partials/widgets/sidenav.dart';
 
 class DashboardRoute extends StatefulWidget {
   DashboardRoute({Key key}) : super(key: key);
@@ -9,32 +9,57 @@ class DashboardRoute extends StatefulWidget {
   _DashboardRouteState createState() => _DashboardRouteState();
 }
 
-class _DashboardRouteState extends State<DashboardRoute> {
+class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
+  AnimationController runAnimationController;
+
+  @override
+  void initState() {
+    super.initState();
+    runAnimationController = AnimationController(vsync: this, duration: Duration(milliseconds: 100));
+  }
+
+  @override
+  void dispose() {
+    runAnimationController.dispose();
+    super.dispose();
+  }
+
+  void runProject() {
+    if (runAnimationController.isCompleted)
+      runAnimationController.reverse();
+    else
+      runAnimationController.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Osum Pie"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.brightness_2),
-            onPressed: () => changeTheme(context),
-          )
-        ],
-      ),
+      appBar: AppBar(title: Text("Osum Pie"), actions: [
+        IconButton(
+          icon: Icon(Icons.brightness_2),
+          onPressed: () => changeTheme(context),
+        )
+      ]),
       body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            'You have pushed the button this many times:',
-          ),
+          Expanded(
+              child: SideNav(
+            child: Column(
+              children: [
+                Text("Hi"),
+              ],
+            ),
+          )),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
+          onPressed: runProject,
+          tooltip: 'Run the project',
+          child: AnimatedIcon(
+            icon: AnimatedIcons.play_pause,
+            progress: runAnimationController,
+          )),
     );
   }
 }

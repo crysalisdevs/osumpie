@@ -13,16 +13,21 @@ void main() {
 class OsumPie extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ));
     return DynamicTheme(
       defaultBrightness: globalBrightness,
-      data: (Brightness brightness) {
+      data: (brightness) {
         final primaryColor = (brightness == Brightness.dark) ? Colors.white : Colors.blue[800];
+        SystemChrome.setSystemUIOverlayStyle((brightness == Brightness.light)
+            ? SystemUiOverlayStyle(
+                statusBarColor: Colors.white,
+                statusBarIconBrightness: Brightness.dark,
+                systemNavigationBarColor: Colors.white,
+                systemNavigationBarIconBrightness: Brightness.dark)
+            : SystemUiOverlayStyle(
+                statusBarColor: Colors.black,
+                statusBarIconBrightness: Brightness.light,
+                systemNavigationBarColor: Colors.black,
+                systemNavigationBarIconBrightness: Brightness.light));
         return ThemeData(
             brightness: brightness,
             appBarTheme: AppBarTheme(
@@ -38,6 +43,7 @@ class OsumPie extends StatelessWidget {
               shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[100],
               elevation: 13.0,
             ),
+            dividerColor: Colors.blueGrey[100],
             primaryColor: Colors.blue[800],
             visualDensity: VisualDensity.adaptivePlatformDensity,
             floatingActionButtonTheme: FloatingActionButtonThemeData(
