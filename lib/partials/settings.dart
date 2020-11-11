@@ -14,10 +14,10 @@ class Settings {
   Map<String, dynamic> _settingsConfig = {};
 
   /// get the width of the side navigation bar
-  int get sideNavWidth => _storage.getInt(_sideNavWidthKey);
+  double get sideNavWidth => _storage.getDouble(_sideNavWidthKey);
 
   /// change the side navigation bar's width property
-  set sideNavWidth(int width) => _storage.setInt(_sideNavWidthKey, width);
+  set sideNavWidth(double width) => _storage.setDouble(_sideNavWidthKey, width);
 
   /// check if the user is requesting dark mode or not
   bool get darkModeEnabled => _storage.getBool(_isDarkModeKey);
