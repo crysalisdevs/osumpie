@@ -1,6 +1,5 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:osumpie/globals.dart';
 import 'package:osumpie/partials/settings.dart';
 import 'package:osumpie/partials/widgets/dash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,16 +10,6 @@ class DashboardRoute extends StatefulWidget {
   @override
   _DashboardRouteState createState() => _DashboardRouteState();
 }
-
-/*
-TabBarView(
-              children: [
-                Icon(Icons.directions_car),
-                Icon(Icons.directions_transit),
-                Icon(Icons.directions_bike),
-              ],
-            ),
-*/
 
 class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
   AnimationController _runAnimationController;
@@ -54,11 +43,7 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
         ]),
         body: DashboardLayout(
           contentChild: TabBarView(
-            children: [
-              Icon(Icons.directions_car),
-              Icon(Icons.directions_transit),
-              Icon(Icons.directions_bike),
-            ],
+            children: [Icon(Icons.directions_car), Icon(Icons.directions_transit), Icon(Icons.directions_bike)],
           ),
           tabChild: TabBar(
             isScrollable: true,
@@ -69,10 +54,7 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
                   Icon(Icons.file_copy, size: 15.0),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(13, 0, 0, 0),
-                      child: Text(
-                        "Test",
-                        style: TextStyle(fontSize: 15.0),
-                      )),
+                      child: Text("Test", style: TextStyle(fontSize: 15.0))),
                   IconButton(
                       splashRadius: 10.0,
                       padding: EdgeInsets.zero,
@@ -85,14 +67,25 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
           sidenavChild: Column(children: [
             Text("Hi"),
           ]),
+          statusBarChild: Row(
+            children: [
+              Icon(Icons.done, color: Colors.white, size: 15),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child: Text("Ready", style: TextStyle(color: Colors.white))),
+            ],
+          ),
         ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: runProject,
-            tooltip: 'Run the project',
-            child: AnimatedIcon(
-              icon: AnimatedIcons.play_pause,
-              progress: _runAnimationController,
-            )),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+          child: FloatingActionButton(
+              onPressed: runProject,
+              tooltip: 'Run the project',
+              child: AnimatedIcon(
+                icon: AnimatedIcons.play_pause,
+                progress: _runAnimationController,
+              )),
+        ),
       ),
     );
   }

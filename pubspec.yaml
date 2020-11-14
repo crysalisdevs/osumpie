@@ -1,7 +1,7 @@
 name: osumpie
 description: A new Flutter project.
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
-  reorderables: ^0.3.2
   shared_preferences: ^0.5.12+2
 
 dev_dependencies:
