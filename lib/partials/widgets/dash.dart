@@ -114,7 +114,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                       color: DynamicTheme.of(context).data.primaryColor,
                       shape: BoxShape.rectangle,
                       boxShadow: [
-                        BoxShadow(color: Colors.blueGrey[100], blurRadius: 5.0),
+                        BoxShadow(color: DynamicTheme.of(context).data.appBarTheme.shadowColor, blurRadius: 5.0),
                       ]),
                   width: MediaQuery.of(context).size.width,
                   child: widget.statusBarChild),
