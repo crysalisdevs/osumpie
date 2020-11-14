@@ -30,6 +30,9 @@ class OsumPie extends StatelessWidget {
                 systemNavigationBarIconBrightness: Brightness.light));
         return ThemeData(
             brightness: brightness,
+            tabBarTheme: TabBarTheme(
+              labelColor: (brightness == Brightness.dark) ? Colors.white : Colors.blueGrey,
+            ),
             appBarTheme: AppBarTheme(
               iconTheme: IconThemeData(color: primaryColor),
               textTheme: TextTheme(
@@ -39,8 +42,8 @@ class OsumPie extends StatelessWidget {
                 fontSize: 25.0,
                 fontWeight: FontWeight.bold,
               ))),
-              color: Colors.transparent,
-              shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[100],
+              color: (brightness == Brightness.dark) ? Colors.black54 : Colors.white,
+              shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[50].withOpacity(0.5),
               elevation: 13.0,
             ),
             dividerColor: Colors.blueGrey[100],
