@@ -1,3 +1,5 @@
+/// Dashboard layout UI
+
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -151,7 +153,10 @@ class _SideNavBorderState extends State<SideNavBorder> {
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               boxShadow: [
-                BoxShadow(color: DynamicTheme.of(context).data.appBarTheme.shadowColor.withOpacity(0.4), blurRadius: 8.0),
+                BoxShadow(
+                  color: DynamicTheme.of(context).data.appBarTheme.shadowColor.withOpacity(0.4),
+                  blurRadius: 8.0,
+                ),
               ],
               border: Border(
                   left: BorderSide(

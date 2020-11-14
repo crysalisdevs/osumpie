@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-Map<String, Object> osumTabs = {"Check": Text("Hi"), "Check2": Text("Hello")};
+import '../../globals.dart';
+
 
 List<Widget> loadTabs(setState) {
   return <Widget>[

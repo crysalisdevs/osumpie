@@ -6,6 +6,8 @@ import 'package:osumpie/partials/widgets/dash.dart';
 import 'package:osumpie/partials/widgets/tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../globals.dart';
+
 class DashboardRoute extends StatefulWidget {
   DashboardRoute({Key key}) : super(key: key);
 
@@ -15,7 +17,7 @@ class DashboardRoute extends StatefulWidget {
 
 class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
   AnimationController _runAnimationController;
-  Map<String, List<Object>> _menus;
+  
   List<String> _menuKeys;
 
   Settings settings;
@@ -31,11 +33,11 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
       length: osumTabs.length,
       child: Scaffold(
         appBar: AppBar(title: Text("Osum Pie"), actions: [
-          for (int i = 0; i < _menus.length; i++)
+          for (int i = 0; i < menus.length; i++)
             SlideInDown(
               child: FlatButton.icon(
                 label: Text(_menuKeys[i]),
-                icon: Icon(_menus[_menuKeys[i]][0]),
+                icon: Icon(menus[_menuKeys[i]][0]),
                 onPressed: () => null,
               ),
             ),
@@ -99,16 +101,19 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
   void initState() {
     super.initState();
     initAsync();
-    if (_menus == null)
-      _menus = {
+    if (menus == null)
+      menus = {
         "File": [Icons.file_copy, null],
         "Edit": [Icons.edit, null],
         "View": [Icons.view_carousel, null],
         "Run": [Icons.play_arrow, null],
         "Help": [Icons.help, null],
       };
-    _menuKeys = _menus.keys.toList();
-    _runAnimationController = AnimationController(vsync: this, duration: Duration(milliseconds: 100));
+    _menuKeys = menus.keys.toList();
+    _runAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 100),
+    );
   }
 
   void runProject() {
