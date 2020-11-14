@@ -31,7 +31,7 @@ class OsumPie extends StatelessWidget {
         return ThemeData(
             brightness: brightness,
             tabBarTheme: TabBarTheme(
-              labelColor: (brightness == Brightness.dark) ? Colors.white : Colors.blueGrey,
+              labelColor: (brightness == Brightness.dark) ? primaryColor : Colors.blueGrey,
             ),
             appBarTheme: AppBarTheme(
               iconTheme: IconThemeData(color: primaryColor),
@@ -43,8 +43,8 @@ class OsumPie extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ))),
               color: (brightness == Brightness.dark) ? Colors.black54 : Colors.white,
-              shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[50].withOpacity(0.5),
-              elevation: 13.0,
+              shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[50],
+              elevation: 1.0,
             ),
             dividerColor: Colors.blueGrey[100],
             primaryColor: Colors.blue[800],

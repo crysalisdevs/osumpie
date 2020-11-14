@@ -1,7 +1,9 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animator/flutter_animator.dart';
 import 'package:osumpie/partials/settings.dart';
 import 'package:osumpie/partials/widgets/dash.dart';
+import 'package:osumpie/partials/widgets/tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardRoute extends StatefulWidget {
@@ -26,47 +28,42 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: osumTabs.length,
       child: Scaffold(
         appBar: AppBar(title: Text("Osum Pie"), actions: [
           for (int i = 0; i < _menus.length; i++)
-            FlatButton.icon(
-              label: Text(_menuKeys[i]),
-              icon: Icon(_menus[_menuKeys[i]][0]),
-              onPressed: () => null,
+            SlideInDown(
+              child: FlatButton.icon(
+                label: Text(_menuKeys[i]),
+                icon: Icon(_menus[_menuKeys[i]][0]),
+                onPressed: () => null,
+              ),
             ),
-          IconButton(
-              icon: Icon(Icons.brightness_2),
-              onPressed: () => DynamicTheme.of(context).setBrightness(
-                    Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
-                  )),
+          SlideInDown(
+            child: IconButton(
+                icon: Icon(Icons.brightness_2),
+                onPressed: () => DynamicTheme.of(context).setBrightness(
+                      Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                    )),
+          ),
         ]),
         body: DashboardLayout(
-          contentChild: TabBarView(
-            children: [Icon(Icons.directions_car), Icon(Icons.directions_transit), Icon(Icons.directions_bike)],
-          ),
-          tabChild: TabBar(
-            isScrollable: true,
-            tabs: [
-              for (int i = 0; i < 3; i++)
-                Tab(
-                    child: Row(children: [
-                  Icon(Icons.file_copy, size: 15.0),
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(13, 0, 0, 0),
-                      child: Text("Test", style: TextStyle(fontSize: 15.0))),
-                  IconButton(
-                      splashRadius: 10.0,
-                      padding: EdgeInsets.zero,
-                      icon: Icon(Icons.close),
-                      iconSize: 16.0,
-                      onPressed: () {})
-                ])),
+          contentChild: TabBarView(children: loadTabContent(setState)),
+          tabChild: TabBar(isScrollable: true, tabs: loadTabs(setState)),
+          sidenavChild: Column(children: [Text("Hi")]),
+          sidenavIconsChild: Column(
+            children: [
+              for (int i = 0; i < 5; i++)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  child: IconButton(
+                    color: DynamicTheme.of(context).data.appBarTheme.iconTheme.color,
+                    icon: Icon(Icons.file_copy, size: 30),
+                    onPressed: () {},
+                  ),
+                )
             ],
           ),
-          sidenavChild: Column(children: [
-            Text("Hi"),
-          ]),
           statusBarChild: Row(
             children: [
               Icon(Icons.done, color: Colors.white, size: 15),
@@ -78,13 +75,15 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
         ),
         floatingActionButton: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-          child: FloatingActionButton(
-              onPressed: runProject,
-              tooltip: 'Run the project',
-              child: AnimatedIcon(
-                icon: AnimatedIcons.play_pause,
-                progress: _runAnimationController,
-              )),
+          child: BounceIn(
+            child: FloatingActionButton(
+                onPressed: runProject,
+                tooltip: 'Run the project',
+                child: AnimatedIcon(
+                  icon: AnimatedIcons.play_pause,
+                  progress: _runAnimationController,
+                )),
+          ),
         ),
       ),
     );
