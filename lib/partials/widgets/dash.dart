@@ -1,11 +1,11 @@
 /// Dashboard layout UI
-
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:osumpie/partials/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../partials/settings.dart';
 
 const sideNavBorderWidth = 10.0;
 

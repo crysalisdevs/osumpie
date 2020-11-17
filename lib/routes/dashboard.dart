@@ -1,12 +1,12 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:osumpie/partials/settings.dart';
-import 'package:osumpie/partials/widgets/dash.dart';
-import 'package:osumpie/partials/widgets/tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../globals.dart';
+import '../partials/settings.dart';
+import '../partials/widgets/dash.dart';
+import '../partials/widgets/tabs.dart';
 
 class DashboardRoute extends StatefulWidget {
   DashboardRoute({Key key}) : super(key: key);
@@ -17,30 +17,22 @@ class DashboardRoute extends StatefulWidget {
 
 class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
   AnimationController _runAnimationController;
-  
-  List<String> _menuKeys;
-
   Settings settings;
-
-  void initAsync() async {
-    final storage = await SharedPreferences.getInstance();
-    settings = Settings(storage);
-  }
 
   @override
   Widget build(BuildContext context) {
+    final menuKeys = menus.keys.toList();
     return DefaultTabController(
       length: osumTabs.length,
       child: Scaffold(
         appBar: AppBar(title: Text("Osum Pie"), actions: [
           for (int i = 0; i < menus.length; i++)
             SlideInDown(
-              child: FlatButton.icon(
-                label: Text(_menuKeys[i]),
-                icon: Icon(menus[_menuKeys[i]][0]),
-                onPressed: () => null,
-              ),
-            ),
+                child: FlatButton.icon(
+              label: Text(menuKeys[i]),
+              icon: Icon(menus[menuKeys[i]][0]),
+              onPressed: () => null,
+            )),
           SlideInDown(
             child: IconButton(
                 icon: Icon(Icons.brightness_2),
@@ -97,22 +89,18 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
     super.dispose();
   }
 
+  void initAsync() async {
+    final storage = await SharedPreferences.getInstance();
+    settings = Settings(storage);
+  }
+
   @override
   void initState() {
     super.initState();
     initAsync();
-    if (menus == null)
-      menus = {
-        "File": [Icons.file_copy, null],
-        "Edit": [Icons.edit, null],
-        "View": [Icons.view_carousel, null],
-        "Run": [Icons.play_arrow, null],
-        "Help": [Icons.help, null],
-      };
-    _menuKeys = menus.keys.toList();
     _runAnimationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 100),
     );
   }
 

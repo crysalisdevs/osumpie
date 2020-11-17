@@ -6,9 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'globals.dart';
 import 'routes/dashboard.dart';
 
-void main() {
-  runApp(OsumPie());
-}
+void main() => runApp(OsumPie());
 
 class OsumPie extends StatelessWidget {
   @override
@@ -33,6 +31,7 @@ class OsumPie extends StatelessWidget {
             tabBarTheme: TabBarTheme(
               labelColor: (brightness == Brightness.dark) ? primaryColor : Colors.blueGrey,
             ),
+            textTheme: TextTheme(headline5: TextStyle(color: Colors.white)),
             appBarTheme: AppBarTheme(
               iconTheme: IconThemeData(color: primaryColor),
               textTheme: TextTheme(
