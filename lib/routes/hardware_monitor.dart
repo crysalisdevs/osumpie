@@ -109,21 +109,43 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     );
   }
 
+  loadMonitorData() async {
+    await Future.delayed(Duration(seconds: 1));
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Expanded(
-          child: buildMonitorList(
-        controller: monitorStateScrollControllerLeft,
-      )),
-      Expanded(
-        child: DraggableScrollbar.semicircle(
-            controller: monitorStateScrollControllerRight,
-            alwaysVisibleScrollThumb: true,
-            child: buildMonitorList(
-              controller: monitorStateScrollControllerRight,
+    return FutureBuilder(
+      future: loadMonitorData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData)
+          return Row(children: [
+            Expanded(
+                child: buildMonitorList(
+              controller: monitorStateScrollControllerLeft,
             )),
-      )
-    ]);
+            Expanded(
+              child: DraggableScrollbar.semicircle(
+                  controller: monitorStateScrollControllerRight,
+                  alwaysVisibleScrollThumb: true,
+                  child: buildMonitorList(
+                    controller: monitorStateScrollControllerRight,
+                  )),
+            )
+          ]);
+        else
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                child: Text("Loading..."),
+              )
+            ],
+          );
+      },
+    );
   }
 }

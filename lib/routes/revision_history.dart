@@ -32,44 +32,83 @@ class _RevisionHistoryState extends State<RevisionHistory> {
     super.dispose();
   }
 
-  Future<Widget> getFileHistory() async {
+  Future<List<Widget>> getFileHistory() async {
     if (!kIsWeb) {
       ProcessResult gitCheck = await Process.run('git', ['--version']);
       if (gitCheck.exitCode == 0) {
         // do git versioning
         if (fileName != null) {
-          ProcessResult gitVersionResult = await Process.run('git', ['log', '-p', fileName]);
-          List<TextSpan> richTextContent = [];
+          ProcessResult gitVersionResult =
+              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', fileName]);
+          List<Widget> commitMsgWidgets = <Widget>[];
           String result = gitVersionResult.stdout as String;
           List<String> lines = result.split('\n');
-          for(int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-            if(lines[lineNumber].startsWith('commit'))
-              richTextContent.add(TextSpan(text: '${lines[lineNumber]}\n', style: TextStyle(color: Colors.red)));
+          for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+            if (lines[lineNumber].startsWith('commit')) {
+              String commitHash = lines[lineNumber].substring(7);
+              String commitMsg = lines[lineNumber + 4].replaceFirst('    ', '');
+              String commitAuthor = '@${lines[lineNumber + 3].substring(12)}';
+              String commitDate = lines[lineNumber + 4].substring(12);
+              commitMsgWidgets.add(ListTile(
+                isThreeLine: true,
+                title: Text(commitMsg, style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(commitAuthor,
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  Text(commitDate)
+                ]),
+                trailing: SizedBox(
+                  width: 420,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(commitHash, style: TextStyle(color: Colors.blueGrey)),
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 20, 0),
+                          child: RaisedButton.icon(
+                            icon: Icon(Icons.undo),
+                            label: Text("Undo"),
+                            onPressed: () {},
+                          )),
+                    ],
+                  ),
+                ),
+                onTap: () {},
+              ));
+              lineNumber += 11;
+            } else if (lines[lineNumber].startsWith('-'))
+              commitMsgWidgets.add(Text(lines[lineNumber].substring(1),
+                  style: TextStyle(
+                    color: Colors.blueGrey[200],
+                    decoration: TextDecoration.lineThrough,
+                  )));
+            else if (lines[lineNumber].startsWith('+'))
+              commitMsgWidgets.add(Text(lines[lineNumber].substring(1),
+                  style: TextStyle(color: Colors.green[800], fontWeight: FontWeight.bold)));
             else
-              richTextContent.add(TextSpan(text: '${lines[lineNumber]}\n', style: TextStyle(color: Colors.black)));
+              commitMsgWidgets.add(Text(lines[lineNumber]));
           }
-          // lines.forEach((line) {
-          //   if (line.startsWith('commit'))
-          //     richTextContent.add(TextSpan(text: '$line\n', style: TextStyle(color: Colors.red)));
-          //   else
-          //     richTextContent.add(TextSpan(text: '$line\n', style: TextStyle(color: Colors.black)));
-          // });
-          return RichText(text: TextSpan(children: richTextContent));
+          return commitMsgWidgets; // RichText(text: TextSpan(children: commitMsgWidgets));
         } else
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Icon(Icons.error),
-              const Padding(
-                padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-                child: const Text("File name not specified"),
-              ),
-            ]),
-          );
+          return <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.error),
+                const Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+                  child: const Text("File name not specified"),
+                ),
+              ]),
+            )
+          ];
       } else
-        return const Text('Git is not installed to work with file versioning');
+        return <Widget>[const Text('Git is not installed to work with file versioning')];
     }
-    return const Text('File versioning not support on web yet');
+    return <Widget>[const Text('File versioning not support on web yet')];
   }
 
   @override
@@ -79,12 +118,13 @@ class _RevisionHistoryState extends State<RevisionHistory> {
       builder: (context, snapshot) {
         if (snapshot.hasData)
           return DraggableScrollbar.semicircle(
-              alwaysVisibleScrollThumb: true,
+            alwaysVisibleScrollThumb: true,
+            controller: revisionHistoryScrollController,
+            child: ListView(
               controller: revisionHistoryScrollController,
-              child: ListView.builder(
-                  itemCount: 1,
-                  controller: revisionHistoryScrollController,
-                  itemBuilder: (context, position) => snapshot.data));
+              children: snapshot.data,
+            ),
+          );
         else
           return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const CircularProgressIndicator(),
