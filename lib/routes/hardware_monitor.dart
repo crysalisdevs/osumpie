@@ -10,7 +10,19 @@ class HardwareMonitorRoute extends StatefulWidget {
 }
 
 class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
-  final monitorStateScrollController = ScrollController();
+  ScrollController monitorStateScrollController;
+
+  @override
+  void initState() {
+    monitorStateScrollController = ScrollController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    monitorStateScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
+import 'package:osumpie/routes/hardware_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../globals.dart';
@@ -29,10 +30,13 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
           for (int i = 0; i < menus.length; i++)
             SlideInDown(
                 child: FlatButton.icon(
-              label: Text(menuKeys[i]),
-              icon: Icon(menus[menuKeys[i]][0]),
-              onPressed: () => null,
-            )),
+                    label: Text(menuKeys[i]),
+                    icon: Icon(menus[menuKeys[i]][0]),
+                    onPressed: () {
+                      setState(
+                        () => osumTabs.addAll({"Stat": HardwareMonitorRoute()}),
+                      );
+                    })),
           SlideInDown(
             child: IconButton(
                 icon: Icon(Icons.brightness_2),
