@@ -6,9 +6,7 @@ import 'routes/hardware_monitor.dart';
 Brightness globalBrightness = Brightness.light;
 
 Map<String, Object> osumTabs = {
-  "Hardware Monitor": HardwareMonitorRoute(),
-  "Check2": Text("Hello"),
-  "File History main.dart": RevisionHistory()
+  "File History main.dart": RevisionHistory(fileName: 'lib/main.dart'),
 };
 
 Map<String, List<Object>> menus = {
