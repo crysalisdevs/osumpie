@@ -58,7 +58,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 width: width,
                 color: DynamicTheme.of(context).data.canvasColor,
                 child: widget.sidenavChild,
-                height: MediaQuery.of(context).size.height,
+                height: MediaQuery.of(context).size.height - 75,
               ),
             )),
         // Icon Bar

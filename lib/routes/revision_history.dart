@@ -46,7 +46,7 @@ class _RevisionHistoryState extends State<RevisionHistory> {
           for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
             if (lines[lineNumber].startsWith('commit')) {
               String commitHash = lines[lineNumber].substring(7);
-              String commitMsg = lines[lineNumber + 4].replaceFirst('    ', '');
+              String commitMsg = lines[lineNumber + 6].replaceFirst('    ', '');
               String commitAuthor = '@${lines[lineNumber + 3].substring(12)}';
               String commitDate = lines[lineNumber + 4].substring(12);
               commitMsgWidgets.add(ListTile(

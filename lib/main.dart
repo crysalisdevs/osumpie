@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'globals.dart';
 import 'routes/dashboard.dart';
 
+// print(SchedulerBinding.instance.window.platformBrightness);
 void main() => runApp(OsumPie());
 
 class OsumPie extends StatelessWidget {

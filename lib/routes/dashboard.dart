@@ -1,6 +1,8 @@
 import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
+import 'package:osumpie/partials/widgets/sidenav_explorer.dart';
 import 'package:osumpie/routes/hardware_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,8 +49,18 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
         ]),
         body: DashboardLayout(
           contentChild: TabBarView(children: loadTabContent(setState)),
-          tabChild: TabBar(isScrollable: true, tabs: loadTabs(setState)),
-          sidenavChild: Column(children: [Text("Hi")]),
+          tabChild: SizedBox(
+              width: MediaQuery.of(context).size.width + 10 - settings.sideNavWidth ?? 2 / 2,
+              child: CupertinoScrollbar(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
+                    child: TabBar(
+                physics: const BouncingScrollPhysics(),
+                isScrollable: true,
+                tabs: loadTabs(setState),
+              ),
+                  ))),
+          sidenavChild: SideNavExplorer(setStateRoot: setState),
           sidenavIconsChild: Column(
             children: [
               for (int i = 0; i < 5; i++)
@@ -95,7 +107,7 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
 
   void initAsync() async {
     final storage = await SharedPreferences.getInstance();
-    settings = Settings(storage);
+    setState(() => settings = Settings(storage));
   }
 
   @override
