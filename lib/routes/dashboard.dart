@@ -21,7 +21,7 @@ class DashboardRoute extends StatefulWidget {
 
 class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
   AnimationController _runAnimationController;
-  Settings settings;
+  Settings _settings;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,8 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
         body: DashboardLayout(
           contentChild: TabBarView(children: loadTabContent(setState)),
           tabChild: SizedBox(
-              width: settings != null
-                  ? MediaQuery.of(context).size.width + 10 - settings.sideNavWidth / 2
+              width: _settings != null
+                  ? MediaQuery.of(context).size.width + 10 - _settings.sideNavWidth / 2
                   : MediaQuery.of(context).size.width,
               child: CupertinoScrollbar(
                   child: Padding(
@@ -110,7 +110,7 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
 
   void initAsync() async {
     final storage = await SharedPreferences.getInstance();
-    setState(() => settings = Settings(storage));
+    setState(() => _settings = Settings(storage));
   }
 
   @override
