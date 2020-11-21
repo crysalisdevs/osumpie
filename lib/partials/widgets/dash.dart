@@ -1,4 +1,3 @@
-/// Dashboard layout UI
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,6 +8,7 @@ import '../../partials/settings.dart';
 
 const sideNavBorderWidth = 10.0;
 
+/// The dashboard widget that holds the sidenav and content widget.
 class DashboardLayout extends StatefulWidget {
   final Widget tabChild;
   final Widget contentChild;
@@ -33,9 +33,9 @@ class SideNavBorder extends StatefulWidget {
 }
 
 class _DashboardLayoutState extends State<DashboardLayout> {
-  double width = 200;
+  double _width = 200;
 
-  Settings settings;
+  Settings _settings;
 
   final Widget tabChild;
   final Widget sidenavChild;
@@ -55,7 +55,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             left: 0,
             child: SlideInLeft(
               child: Container(
-                width: width,
+                width: _width,
                 color: DynamicTheme.of(context).data.canvasColor,
                 child: widget.sidenavChild,
                 height: MediaQuery.of(context).size.height - 75,
@@ -82,28 +82,28 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             )),
         // Sidenav Border
         Positioned(
-            left: width - sideNavBorderWidth / 2,
+            left: _width - sideNavBorderWidth / 2,
             child: SlideInLeft(
               child: SideNavBorder(onDrag: (dx, dy) {
-                var newWidth = width + dx;
-                setState(() => settings.sideNavWidth = width = newWidth > 0 ? newWidth : 0);
+                var newWidth = _width + dx;
+                setState(() => _settings.sideNavWidth = _width = newWidth > 0 ? newWidth : 0);
               }),
             )),
         // Tabs
         Positioned(
-            left: width + 10 - sideNavBorderWidth / 2,
+            left: _width + 10 - sideNavBorderWidth / 2,
             child: SlideInDown(
               child: widget.tabChild,
             )),
         // Tab Content
         Positioned(
-            left: width + 10 - sideNavBorderWidth / 2,
+            left: _width + 10 - sideNavBorderWidth / 2,
             top: 45,
             child: FadeIn(
               preferences: AnimationPreferences(offset: Duration(seconds: 1)),
               child: SizedBox(
                   height: MediaQuery.of(context).size.height - 103,
-                  width: MediaQuery.of(context).size.width - width - 8,
+                  width: MediaQuery.of(context).size.width - _width - 8,
                   child: widget.contentChild),
             )),
         // Status Bar
@@ -127,8 +127,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
   void initAsync() async {
     final storage = await SharedPreferences.getInstance();
-    settings = Settings(storage);
-    setState(() => width = settings.sideNavWidth ?? 200);
+    _settings = Settings(storage);
+    setState(() => _width = _settings.sideNavWidth ?? 200);
   }
 
   @override
@@ -139,8 +139,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 }
 
 class _SideNavBorderState extends State<SideNavBorder> {
-  double initX;
-  double initY;
+  double _initX;
+  double _initY;
 
   @override
   Widget build(BuildContext context) {
@@ -170,15 +170,15 @@ class _SideNavBorderState extends State<SideNavBorder> {
   }
 
   void _handleDrag(details) => setState(() {
-        initX = details.globalPosition.dx;
-        initY = details.globalPosition.dy;
+        _initX = details.globalPosition.dx;
+        _initY = details.globalPosition.dy;
       });
 
   void _handleUpdate(details) {
-    var dx = details.globalPosition.dx - initX;
-    var dy = details.globalPosition.dy - initY;
-    initX = details.globalPosition.dx;
-    initY = details.globalPosition.dy;
+    var dx = details.globalPosition.dx - _initX;
+    var dy = details.globalPosition.dy - _initY;
+    _initX = details.globalPosition.dx;
+    _initY = details.globalPosition.dy;
     widget.onDrag(dx, dy);
   }
 }

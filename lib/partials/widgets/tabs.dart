@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../globals.dart';
 
-
+/// Load the tabs into the application.
+/// 
+/// Pass the [setState] of the dashboard widget.
 List<Widget> loadTabs(setState) {
   return <Widget>[
     for (String tab in osumTabs.keys)
@@ -26,6 +28,9 @@ List<Widget> loadTabs(setState) {
   ];
 }
 
+/// Load the tab contents into the application.
+/// 
+/// Pass the [setState] of the dashboard widget.
 List<Widget> loadTabContent(setState) {
   return <Widget>[for (String tab in osumTabs.keys) osumTabs[tab]];
 }

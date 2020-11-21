@@ -11,6 +11,7 @@ import '../partials/widgets/sidenav_explorer.dart';
 import '../partials/widgets/tabs.dart';
 import '../routes/hardware_monitor.dart';
 
+/// The main dashboard route which holds the dashboard widget.
 class DashboardRoute extends StatefulWidget {
   DashboardRoute({Key key}) : super(key: key);
 

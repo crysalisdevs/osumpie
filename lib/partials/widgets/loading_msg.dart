@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Display loading msg [loadingMsg] as widget
 class OsumPieLoadingMsg extends StatelessWidget {
   final String loadingMsg;
   const OsumPieLoadingMsg({Key key, this.loadingMsg}) : super(key: key);
