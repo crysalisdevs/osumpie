@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
+import '../partials/widgets/loading_msg.dart';
+
+/// Display all the hardware metrics in a widget
 class HardwareMonitorRoute extends StatefulWidget {
   HardwareMonitorRoute({Key key}) : super(key: key);
 
@@ -17,26 +20,26 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     a grid view. To work around this, the widgets are wrapped within two list views
     and share the same scroll controller for even scrolling.
   */
-  LinkedScrollControllerGroup monitorStateScrollController;
+  LinkedScrollControllerGroup _monitorStateScrollController;
 
-  ScrollController monitorStateScrollControllerLeft;
-  ScrollController monitorStateScrollControllerRight;
+  ScrollController _monitorStateScrollControllerLeft;
+  ScrollController _monitorStateScrollControllerRight;
 
-  final metrics = ["CPU", "GPU", "TEMP", "RAM", "ROM", "POWER"];
+  final _metrics = ["CPU", "GPU", "TEMP", "RAM", "ROM", "POWER"];
 
   @override
   void initState() {
     super.initState();
-    monitorStateScrollController = LinkedScrollControllerGroup();
-    monitorStateScrollControllerLeft = monitorStateScrollController.addAndGet();
-    monitorStateScrollControllerRight = monitorStateScrollController.addAndGet();
+    _monitorStateScrollController = LinkedScrollControllerGroup();
+    _monitorStateScrollControllerLeft = _monitorStateScrollController.addAndGet();
+    _monitorStateScrollControllerRight = _monitorStateScrollController.addAndGet();
   }
 
   @override
   void dispose() {
-    monitorStateScrollController = null; // No dispose() method, hopefully garbage collected.
-    monitorStateScrollControllerLeft.dispose();
-    monitorStateScrollControllerRight.dispose();
+    _monitorStateScrollController = null; // No dispose() method, hopefully garbage collected.
+    _monitorStateScrollControllerLeft?.dispose();
+    _monitorStateScrollControllerRight?.dispose();
     super.dispose();
   }
 
@@ -62,7 +65,7 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
                     child: SingleChildScrollView(
                       child: Wrap(
                         children: [
-                          for (String metric in metrics)
+                          for (String metric in _metrics)
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: CircularPercentIndicator(
@@ -109,7 +112,8 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     );
   }
 
-  loadMonitorData() async {
+  // TODO: build the logic for getting hardware metrics
+  Future<dynamic> loadMonitorData() async {
     await Future.delayed(Duration(seconds: 1));
     return '';
   }
@@ -123,27 +127,20 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
           return Row(children: [
             Expanded(
                 child: buildMonitorList(
-              controller: monitorStateScrollControllerLeft,
+              controller: _monitorStateScrollControllerLeft,
             )),
             Expanded(
               child: DraggableScrollbar.semicircle(
-                  controller: monitorStateScrollControllerRight,
+                  controller: _monitorStateScrollControllerRight,
                   alwaysVisibleScrollThumb: true,
                   child: buildMonitorList(
-                    controller: monitorStateScrollControllerRight,
+                    controller: _monitorStateScrollControllerRight,
                   )),
             )
           ]);
         else
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
-                child: Text("Loading..."),
-              )
-            ],
+          return OsumPieLoadingMsg(
+            loadingMsg: "Fetching hardware info...",
           );
       },
     );

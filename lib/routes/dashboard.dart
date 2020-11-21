@@ -2,14 +2,14 @@ import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:osumpie/partials/widgets/sidenav_explorer.dart';
-import 'package:osumpie/routes/hardware_monitor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../globals.dart';
 import '../partials/settings.dart';
 import '../partials/widgets/dash.dart';
+import '../partials/widgets/sidenav_explorer.dart';
 import '../partials/widgets/tabs.dart';
+import '../routes/hardware_monitor.dart';
 
 class DashboardRoute extends StatefulWidget {
   DashboardRoute({Key key}) : super(key: key);
@@ -50,16 +50,18 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
         body: DashboardLayout(
           contentChild: TabBarView(children: loadTabContent(setState)),
           tabChild: SizedBox(
-              width: MediaQuery.of(context).size.width + 10 - settings.sideNavWidth ?? 2 / 2,
+              width: settings != null
+                  ? MediaQuery.of(context).size.width + 10 - settings.sideNavWidth / 2
+                  : MediaQuery.of(context).size.width,
               child: CupertinoScrollbar(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
-                    child: TabBar(
-                physics: const BouncingScrollPhysics(),
-                isScrollable: true,
-                tabs: loadTabs(setState),
-              ),
-                  ))),
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
+                child: TabBar(
+                  physics: const BouncingScrollPhysics(),
+                  isScrollable: true,
+                  tabs: loadTabs(setState),
+                ),
+              ))),
           sidenavChild: SideNavExplorer(setStateRoot: setState),
           sidenavIconsChild: Column(
             children: [

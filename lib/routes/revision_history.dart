@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:osumpie/partials/widgets/error_msg.dart';
+import 'package:osumpie/partials/widgets/loading_msg.dart';
 
+/// Displays the revision history of the [fileName] using git
 class RevisionHistory extends StatefulWidget {
   final String fileName;
 
@@ -18,20 +21,21 @@ class _RevisionHistoryState extends State<RevisionHistory> {
 
   _RevisionHistoryState(this.fileName);
 
-  ScrollController revisionHistoryScrollController;
+  ScrollController _revisionHistoryScrollController;
 
   @override
   void initState() {
-    revisionHistoryScrollController = ScrollController();
+    _revisionHistoryScrollController = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
-    revisionHistoryScrollController.dispose();
+    _revisionHistoryScrollController?.dispose();
     super.dispose();
   }
 
+  /// Get the file history using git commands.
   Future<List<Widget>> getFileHistory() async {
     if (!kIsWeb) {
       ProcessResult gitCheck = await Process.run('git', ['--version']);
@@ -49,6 +53,7 @@ class _RevisionHistoryState extends State<RevisionHistory> {
               String commitMsg = lines[lineNumber + 6].replaceFirst('    ', '');
               String commitAuthor = '@${lines[lineNumber + 3].substring(12)}';
               String commitDate = lines[lineNumber + 4].substring(12);
+
               commitMsgWidgets.add(ListTile(
                 isThreeLine: true,
                 title: Text(commitMsg, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -95,15 +100,10 @@ class _RevisionHistoryState extends State<RevisionHistory> {
         } else
           return <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Icon(Icons.error),
-                const Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
-                  child: const Text("File name not specified"),
-                ),
-              ]),
-            )
+                padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                child: OsumPieErrorMsg(
+                  error: "File name not specified",
+                ))
           ];
       } else
         return <Widget>[const Text('Git is not installed to work with file versioning')];
@@ -119,20 +119,16 @@ class _RevisionHistoryState extends State<RevisionHistory> {
         if (snapshot.hasData)
           return DraggableScrollbar.semicircle(
             alwaysVisibleScrollThumb: true,
-            controller: revisionHistoryScrollController,
+            controller: _revisionHistoryScrollController,
             child: ListView(
-              controller: revisionHistoryScrollController,
+              controller: _revisionHistoryScrollController,
               children: snapshot.data,
             ),
           );
         else
-          return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const CircularProgressIndicator(),
-            const Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-              child: Text("Waiting for git..."),
-            )
-          ]);
+          return const OsumPieLoadingMsg(
+            loadingMsg: "Waiting for git...",
+          );
       },
     );
   }

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:osumpie/routes/revision_history.dart';
 
 import 'routes/hardware_monitor.dart';
 
 Brightness globalBrightness = Brightness.light;
 
-Map<String, Object> osumTabs = {
-  "File History main.dart": RevisionHistory(fileName: 'lib/main.dart'),
-};
+Map<String, Object> osumTabs = {};
 
 Map<String, List<Object>> menus = {
   "Stat": [Icons.hardware, HardwareMonitorRoute()],
