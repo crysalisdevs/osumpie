@@ -8,18 +8,18 @@ import 'package:osumpie/partials/widgets/loading_msg.dart';
 
 /// Displays the revision history of the [fileName] using git
 class RevisionHistory extends StatefulWidget {
-  final String fileName;
+  final String filename;
 
-  RevisionHistory({Key key, @required this.fileName}) : super(key: key);
+  RevisionHistory({Key key, @required this.filename}) : super(key: key);
 
   @override
-  _RevisionHistoryState createState() => _RevisionHistoryState(fileName);
+  _RevisionHistoryState createState() => _RevisionHistoryState(filename);
 }
 
 class _RevisionHistoryState extends State<RevisionHistory> {
-  final String fileName;
+  final String filename;
 
-  _RevisionHistoryState(this.fileName);
+  _RevisionHistoryState(this.filename);
 
   ScrollController _revisionHistoryScrollController;
 
@@ -41,9 +41,9 @@ class _RevisionHistoryState extends State<RevisionHistory> {
       ProcessResult gitCheck = await Process.run('git', ['--version']);
       if (gitCheck.exitCode == 0) {
         // do git versioning
-        if (fileName != null) {
+        if (filename != null) {
           ProcessResult gitVersionResult =
-              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', fileName]);
+              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', filename]);
           List<Widget> commitMsgWidgets = <Widget>[];
           String result = gitVersionResult.stdout as String;
           List<String> lines = result.split('\n');

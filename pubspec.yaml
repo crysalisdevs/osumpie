@@ -1,5 +1,5 @@
 name: osumpie
-description: A new Flutter project.
+description: Automate IoT using Osum Pie
 
 publish_to: "none"
 
@@ -12,11 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  rich_code_editor:
-    git:
-      url: https://github.com/redsolver/rich_code_editor.git
-
   path: ^1.7.0
+  filex: ^0.2.2
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
   flutter_animator: ^2.1.0
