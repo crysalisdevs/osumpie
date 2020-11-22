@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:filex/filex.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:osumpie/routes/revision_history.dart';
 
 import '../../globals.dart';
 import '../../routes/file_editor.dart';
+import '../../routes/revision_history.dart';
 
 /// The side navigation bar widget
 class SideNavExplorer extends StatefulWidget {

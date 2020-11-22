@@ -38,14 +38,14 @@ class _RevisionHistoryState extends State<RevisionHistory> {
   /// Get the file history using git commands.
   Future<List<Widget>> getFileHistory() async {
     if (!kIsWeb) {
-      ProcessResult gitCheck = await Process.run('git', ['--version']);
+      ProcessResult gitCheck = await Process.run('git', ['--version'], runInShell: false);
       if (gitCheck.exitCode == 0) {
         // do git versioning
         if (filename != null) {
-          ProcessResult gitVersionResult =
-              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', filename]);
+          ProcessResult fileVersionResult =
+              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', filename], runInShell: false);
           List<Widget> commitMsgWidgets = <Widget>[];
-          String result = gitVersionResult.stdout as String;
+          String result = fileVersionResult.stdout as String;
           List<String> lines = result.split('\n');
           for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
             if (lines[lineNumber].startsWith('commit')) {
