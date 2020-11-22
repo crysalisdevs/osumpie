@@ -19,7 +19,7 @@ class RecipeNode extends StatefulWidget {
   final String description;
   final Map<String, dynamic> parameters;
 
-  static List<RecipeNode> nodes;
+  static List<RecipeNode> nodes = [];
 
   RecipeNode({
     @required this.top,

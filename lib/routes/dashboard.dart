@@ -19,8 +19,7 @@ class DashboardRoute extends StatefulWidget {
   _DashboardRouteState createState() => _DashboardRouteState();
 }
 
-class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProviderStateMixin {
-  AnimationController _runAnimationController;
+class _DashboardRouteState extends State<DashboardRoute> {
   Settings _settings;
 
   @override
@@ -86,26 +85,8 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
             ],
           ),
         ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-          child: BounceIn(
-            child: FloatingActionButton(
-                onPressed: runProject,
-                tooltip: 'Run the project',
-                child: AnimatedIcon(
-                  icon: AnimatedIcons.play_pause,
-                  progress: _runAnimationController,
-                )),
-          ),
-        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _runAnimationController.dispose();
-    super.dispose();
   }
 
   void initAsync() async {
@@ -117,16 +98,5 @@ class _DashboardRouteState extends State<DashboardRoute> with SingleTickerProvid
   void initState() {
     super.initState();
     initAsync();
-    _runAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-  }
-
-  void runProject() {
-    if (_runAnimationController.isCompleted)
-      _runAnimationController.reverse();
-    else
-      _runAnimationController.forward();
   }
 }
