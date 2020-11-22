@@ -11,12 +11,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 {
   // Attach to console when present (e.g., 'flutter run') or create a
   // new console when running with a debugger.
+
   // if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
   //   CreateAndAttachConsole();
   // }
-  /*
-  Dart issue cannot hide console the above is replaced with this code
-  */
+  //
+  //  Dart issue cannot hide console the above is replaced with this code
+  //  https://github.com/flutter/flutter/issues/47891#issuecomment-708850435
+  //
+
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent())
   {
     CreateAndAttachConsole();
