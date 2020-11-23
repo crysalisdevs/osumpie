@@ -30,6 +30,12 @@ $ flutter build apk --release --target-platform android-arm64 --obfuscate --shri
 $ flutter build windows --release
 ```
 
+### 3.3 Linux
+
+```bash
+$ flutter build linux --release
+```
+
 | Web support is not enabled yet
 
 ## Developer's Note
