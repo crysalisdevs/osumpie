@@ -84,8 +84,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
               child: FloatingActionButton(
                   tooltip: 'Add recipe block',
                   child: Icon(Icons.add),
-                  onPressed: () {
-                    setState(() => _nodes.addAll([
+                  onPressed: () => setState(() => _nodes.add(
                           RecipeNode(
                             description: '',
                             left: 0,
@@ -94,9 +93,8 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                             width: 200,
                             height: 100,
                             top: 0,
-                          )
-                        ]));
-                  }))),
+                          ),
+                        ))))),
       Positioned(
         right: 10,
         child: BounceIn(

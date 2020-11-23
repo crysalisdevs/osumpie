@@ -5,6 +5,7 @@ Automate your ecosystem with Osum Pie!
 ## Building
 
 ### 1. Get the source files
+
 Clone along w/ the submodules
 
 ```bash
@@ -12,6 +13,7 @@ $ git clone https://github.com/crysalisdevs/osumpie.git --recursive
 ```
 
 ### 2. Create and generate
+
 Before building execute the below code to get the project platform files and code generation.
 
 ```bash
@@ -33,11 +35,13 @@ $ flutter build windows --release
 ### 3.3 Linux
 
 Enable linux in flutter config
+
 ```bash
 $ flutter config --enable-linux-desktop
 ```
 
 and then then build for linux
+
 ```bash
 $ flutter build linux --release
 ```
@@ -51,6 +55,7 @@ and then hidden during runtime. Change the if condition in main.cpp under window
 Issue found at flutter version 1.24.0-8.0-pre341 and below (possibly above if the issue is not fixed).
 
 file: `windows\main.cpp`
+
 ```cpp
 if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent())
   {

@@ -37,31 +37,52 @@ class RecipeNode extends StatefulWidget {
   });
 
   factory RecipeNode.fromJson(Map<String, dynamic> item) => _$RecipeNodeFromJson(item);
-  Map<String, dynamic> toJson() => _$RecipeNodeToJson(this);
-
   @override
   _RecipeNodeState createState() => _RecipeNodeState();
+
+  Map<String, dynamic> toJson() => _$RecipeNodeToJson(this);
 }
 
 class _RecipeNodeState extends State<RecipeNode> {
   GlobalKey _key = GlobalKey();
-  double top, left;
-  double xOff, yOff;
+  double _top;
+  double _left;
+  double _xOff;
+  double _yOff;
+  double _width;
+  double _height;
+
+  Widget get buildNodeUi => GradientCard(
+      gradient: Gradients.deepSpace,
+      child: Center(
+        child: Text(
+          "Hi",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ));
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
       key: _key,
-      top: top,
-      left: left,
+      top: _top,
+      left: _left,
+      width: _width,
+      height: _height,
       child: Draggable(
-        child: Icon(Icons.input),
-        feedback: Icon(Icons.input),
-        childWhenDragging: Container(),
+        child: buildNodeUi,
+        feedback: SizedBox(
+          width: _width + 10,
+          height: _height + 10,
+          child: buildNodeUi,
+        ),
+        childWhenDragging: buildNodeUi,
         onDragEnd: (drag) {
           setState(() {
-            top = drag.offset.dy - yOff;
-            left = drag.offset.dx - xOff;
+            _top = drag.offset.dy - _yOff;
+            _left = drag.offset.dx - _xOff;
           });
         },
       ),
@@ -70,19 +91,19 @@ class _RecipeNodeState extends State<RecipeNode> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
-    top = widget.top;
-    left = widget.left;
+    WidgetsBinding.instance.addPostFrameCallback(_getRenderOffsets);
+    _top = widget.top;
+    _left = widget.left;
+    _width = widget.width;
+    _height = widget.height;
     super.initState();
   }
 
-  void _afterLayout(_) => _getRenderOffsets();
-
-  void _getRenderOffsets() {
-    final RenderBox renderBoxWidget = _key.currentContext.findRenderObject();
+  void _getRenderOffsets(_) {
+    final renderBoxWidget = _key.currentContext.findRenderObject() as RenderBox;
     final offset = renderBoxWidget.localToGlobal(Offset.zero);
 
-    yOff = offset.dy - top;
-    xOff = offset.dx - left;
+    _yOff = offset.dy - _top;
+    _xOff = offset.dx - _left;
   }
 }
