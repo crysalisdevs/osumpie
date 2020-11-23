@@ -11,7 +11,7 @@ Clone along w/ the submodules
 $ git clone https://github.com/crysalisdevs/osumpie.git --recursive
 ```
 
-### 2. create and generate
+### 2. Create and generate
 Before building execute the below code to get the project platform files and code generation.
 
 ```bash
@@ -85,4 +85,10 @@ The project uses bakecode_jobs api. Include it by executing the below code.
 
 ```bash
 $ git submodule add https://github.com/crysalisdevs/bakecode-jobs.git
+```
+
+### To update submodules or fetch new submodules
+
+```bash
+$ git submodule update --init --recursive
 ```
