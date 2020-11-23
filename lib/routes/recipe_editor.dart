@@ -79,24 +79,24 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         ),
       ),
       Positioned(
-        right: 80,
-        child: BounceIn(
-          child: FloatingActionButton(
-              tooltip: 'Add recipe block',
-              child: Icon(Icons.add),
-              onPressed: () => setState(() => _nodes.addAll([RecipeNode(
-                    bottom: null,
-                    right: 0,
-                    description: '',
-                    height: null,
-                    left: 0,
-                    parameters: {},
-                    title: 'Hi',
-                    width: 200,
-                    top: null,
-                  )]))),
-        ),
-      ),
+          right: 80,
+          child: BounceIn(
+              child: FloatingActionButton(
+                  tooltip: 'Add recipe block',
+                  child: Icon(Icons.add),
+                  onPressed: () {
+                    setState(() => _nodes.addAll([
+                          RecipeNode(
+                            description: '',
+                            left: 0,
+                            properties: {},
+                            title: 'Hi',
+                            width: 200,
+                            height: 100,
+                            top: 0,
+                          )
+                        ]));
+                  }))),
       Positioned(
         right: 10,
         child: BounceIn(
