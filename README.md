@@ -15,8 +15,7 @@ $ git clone https://github.com/crysalisdevs/osumpie.git --recursive
 Before building execute the below code to get the project platform files and code generation.
 
 ```bash
-$ flutter create .
-$ flutter packages pub run build_runner run --delete-conflicting-outputs
+$ flutter create . && flutter packages pub run build_runner run --delete-conflicting-outputs
 ```
 
 ### 3.1 Android
