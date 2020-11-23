@@ -32,6 +32,12 @@ $ flutter build windows --release
 
 ### 3.3 Linux
 
+Enable linux in flutter config
+```bash
+$ flutter config --enable-linux-desktop
+```
+
+and then then build for linux
 ```bash
 $ flutter build linux --release
 ```
