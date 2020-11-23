@@ -28,19 +28,31 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
   final _metrics = ["CPU", "GPU", "TEMP", "RAM", "ROM", "POWER"];
 
   @override
-  void initState() {
-    super.initState();
-    _monitorStateScrollController = LinkedScrollControllerGroup();
-    _monitorStateScrollControllerLeft = _monitorStateScrollController.addAndGet();
-    _monitorStateScrollControllerRight = _monitorStateScrollController.addAndGet();
-  }
-
-  @override
-  void dispose() {
-    _monitorStateScrollController = null; // No dispose() method, hopefully garbage collected.
-    _monitorStateScrollControllerLeft?.dispose();
-    _monitorStateScrollControllerRight?.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadMonitorData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData)
+          return Row(children: [
+            Expanded(
+                child: buildMonitorList(
+              controller: _monitorStateScrollControllerLeft,
+            )),
+            Expanded(
+              child: DraggableScrollbar.semicircle(
+                  controller: _monitorStateScrollControllerRight,
+                  alwaysVisibleScrollThumb: true,
+                  child: buildMonitorList(
+                    controller: _monitorStateScrollControllerRight,
+                  )),
+            )
+          ]);
+        else
+          return OsumPieLoadingMsg(
+            loadingMsg: "Fetching hardware info...",
+          );
+      },
+    );
   }
 
   Widget buildMonitorList({@required ScrollController controller}) {
@@ -112,37 +124,25 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     );
   }
 
+  @override
+  void dispose() {
+    _monitorStateScrollController = null; // No dispose() method, hopefully garbage collected.
+    _monitorStateScrollControllerLeft?.dispose();
+    _monitorStateScrollControllerRight?.dispose();
+    super.dispose();
+  }
+
   // TODO: build the logic for getting hardware metrics
+  @override
+  void initState() {
+    super.initState();
+    _monitorStateScrollController = LinkedScrollControllerGroup();
+    _monitorStateScrollControllerLeft = _monitorStateScrollController.addAndGet();
+    _monitorStateScrollControllerRight = _monitorStateScrollController.addAndGet();
+  }
+
   Future<dynamic> loadMonitorData() async {
     await Future.delayed(Duration(seconds: 1));
     return '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: loadMonitorData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData)
-          return Row(children: [
-            Expanded(
-                child: buildMonitorList(
-              controller: _monitorStateScrollControllerLeft,
-            )),
-            Expanded(
-              child: DraggableScrollbar.semicircle(
-                  controller: _monitorStateScrollControllerRight,
-                  alwaysVisibleScrollThumb: true,
-                  child: buildMonitorList(
-                    controller: _monitorStateScrollControllerRight,
-                  )),
-            )
-          ]);
-        else
-          return OsumPieLoadingMsg(
-            loadingMsg: "Fetching hardware info...",
-          );
-      },
-    );
   }
 }

@@ -19,35 +19,16 @@ class DashboardLayout extends StatefulWidget {
   DashboardLayout({this.sidenavChild, this.tabChild, this.contentChild, this.statusBarChild, this.sidenavIconsChild});
 
   @override
-  _DashboardLayoutState createState() =>
-      _DashboardLayoutState(sidenavChild, tabChild, contentChild, statusBarChild, sidenavIconsChild);
-}
-
-class SideNavBorder extends StatefulWidget {
-  final Function onDrag;
-
-  SideNavBorder({Key key, this.onDrag});
-
-  @override
-  _SideNavBorderState createState() => _SideNavBorderState();
+  _DashboardLayoutState createState() => _DashboardLayoutState();
 }
 
 class _DashboardLayoutState extends State<DashboardLayout> {
   double _width = 200;
-
   Settings _settings;
-
-  final Widget tabChild;
-  final Widget sidenavChild;
-  final Widget contentChild;
-  final Widget statusBarChild;
-  final Widget sidenavIconsChild;
-
-  _DashboardLayoutState(
-      this.tabChild, this.sidenavChild, this.contentChild, this.statusBarChild, this.sidenavIconsChild);
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context).size;
     return Stack(
       children: <Widget>[
         // Sidenav Content
@@ -58,7 +39,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 width: _width,
                 color: DynamicTheme.of(context).data.canvasColor,
                 child: widget.sidenavChild,
-                height: MediaQuery.of(context).size.height - 75,
+                height: media.height - 75,
               ),
             )),
         // Icon Bar
@@ -77,7 +58,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                   padding: const EdgeInsets.fromLTRB(3, 8, 8, 8),
                   child: widget.sidenavIconsChild,
                 ),
-                height: MediaQuery.of(context).size.height,
+                height: media.height,
               ),
             )),
         // Sidenav Border
@@ -101,10 +82,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             top: 45,
             child: FadeIn(
               preferences: AnimationPreferences(offset: Duration(seconds: 1)),
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height - 103,
-                  width: MediaQuery.of(context).size.width - _width - 8,
-                  child: widget.contentChild),
+              child: SizedBox(height: media.height - 103, width: media.width - _width - 8, child: widget.contentChild),
             )),
         // Status Bar
         Positioned(
@@ -118,7 +96,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                       boxShadow: [
                         BoxShadow(color: DynamicTheme.of(context).data.appBarTheme.shadowColor, blurRadius: 5.0),
                       ]),
-                  width: MediaQuery.of(context).size.width,
+                  width: media.width,
                   child: widget.statusBarChild),
             )),
       ],
@@ -138,18 +116,28 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   }
 }
 
+class SideNavBorder extends StatefulWidget {
+  final Function onDrag;
+
+  SideNavBorder({Key key, this.onDrag});
+
+  @override
+  _SideNavBorderState createState() => _SideNavBorderState();
+}
+
 class _SideNavBorderState extends State<SideNavBorder> {
   double _initX;
   double _initY;
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.of(context).size;
     return GestureDetector(
       onPanStart: _handleDrag,
       onPanUpdate: _handleUpdate,
       child: Container(
           width: sideNavBorderWidth,
-          height: MediaQuery.of(context).size.height,
+          height: media.height,
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               boxShadow: [

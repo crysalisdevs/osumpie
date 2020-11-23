@@ -10,36 +10,18 @@ import '../../routes/revision_history.dart';
 
 /// The side navigation bar widget
 class SideNavExplorer extends StatefulWidget {
-  SideNavExplorer({Key key, this.setStateRoot}) : super(key: key);
   final StateSetter setStateRoot;
 
+  SideNavExplorer({Key key, this.setStateRoot}) : super(key: key);
+
   @override
-  _SideNavExplorerState createState() => _SideNavExplorerState(setStateRoot);
+  _SideNavExplorerState createState() => _SideNavExplorerState();
 }
 
 class _SideNavExplorerState extends State<SideNavExplorer> {
   List<String> files;
   ScrollController _directoryScrollController;
   FilexController _filexController;
-
-  final StateSetter setStateRoot;
-
-  _SideNavExplorerState(this.setStateRoot);
-
-  @override
-  void initState() {
-    files = <String>[];
-    _directoryScrollController = ScrollController();
-    _filexController = FilexController(path: Directory.current.path);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _directoryScrollController?.dispose();
-    _filexController?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +40,13 @@ class _SideNavExplorerState extends State<SideNavExplorer> {
                     children: [
                       IconButton(
                         icon: Icon(Icons.open_in_new),
-                        onPressed: () => setStateRoot(() => osumTabs.addAll({
+                        onPressed: () => widget.setStateRoot(() => osumTabs.addAll({
                               item.filename: FileRawEditor(filename: item.path),
                             })),
                       ),
                       IconButton(
                         icon: Icon(Icons.undo),
-                        onPressed: () => setStateRoot(() => osumTabs.addAll({
+                        onPressed: () => widget.setStateRoot(() => osumTabs.addAll({
                               item.filename: RevisionHistory(filename: item.path),
                             })),
                       )
@@ -79,5 +61,20 @@ class _SideNavExplorerState extends State<SideNavExplorer> {
             ),
           ],
         ));
+  }
+
+  @override
+  void dispose() {
+    _directoryScrollController?.dispose();
+    _filexController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    files = <String>[];
+    _directoryScrollController = ScrollController();
+    _filexController = FilexController(path: Directory.current.path);
+    super.initState();
   }
 }

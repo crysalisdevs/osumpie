@@ -16,6 +16,7 @@ dependencies:
   filex: ^0.2.2
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
+  gradient_widgets: ^0.5.1
   percent_indicator: ^2.1.7+2
   flutter_animator: ^2.1.0
   json_serializable: ^3.5.0

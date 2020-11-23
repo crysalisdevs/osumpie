@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:osumpie/partials/widgets/error_msg.dart';
-import 'package:osumpie/partials/widgets/loading_msg.dart';
+
+import '../partials/widgets/error_msg.dart';
+import '../partials/widgets/loading_msg.dart';
 
 /// Displays the revision history of the [fileName] using git
 class RevisionHistory extends StatefulWidget {
@@ -13,20 +14,32 @@ class RevisionHistory extends StatefulWidget {
   RevisionHistory({Key key, @required this.filename}) : super(key: key);
 
   @override
-  _RevisionHistoryState createState() => _RevisionHistoryState(filename);
+  _RevisionHistoryState createState() => _RevisionHistoryState();
 }
 
 class _RevisionHistoryState extends State<RevisionHistory> {
-  final String filename;
-
-  _RevisionHistoryState(this.filename);
-
   ScrollController _revisionHistoryScrollController;
 
   @override
-  void initState() {
-    _revisionHistoryScrollController = ScrollController();
-    super.initState();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: getFileHistory(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData)
+          return DraggableScrollbar.semicircle(
+            alwaysVisibleScrollThumb: true,
+            controller: _revisionHistoryScrollController,
+            child: ListView(
+              controller: _revisionHistoryScrollController,
+              children: snapshot.data,
+            ),
+          );
+        else
+          return const OsumPieLoadingMsg(
+            loadingMsg: "Waiting for git...",
+          );
+      },
+    );
   }
 
   @override
@@ -41,9 +54,9 @@ class _RevisionHistoryState extends State<RevisionHistory> {
       ProcessResult gitCheck = await Process.run('git', ['--version'], runInShell: false);
       if (gitCheck.exitCode == 0) {
         // do git versioning
-        if (filename != null) {
+        if (widget.filename != null) {
           ProcessResult fileVersionResult =
-              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', filename], runInShell: false);
+              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', widget.filename], runInShell: false);
           List<Widget> commitMsgWidgets = <Widget>[];
           String result = fileVersionResult.stdout as String;
           List<String> lines = result.split('\n');
@@ -112,24 +125,8 @@ class _RevisionHistoryState extends State<RevisionHistory> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getFileHistory(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData)
-          return DraggableScrollbar.semicircle(
-            alwaysVisibleScrollThumb: true,
-            controller: _revisionHistoryScrollController,
-            child: ListView(
-              controller: _revisionHistoryScrollController,
-              children: snapshot.data,
-            ),
-          );
-        else
-          return const OsumPieLoadingMsg(
-            loadingMsg: "Waiting for git...",
-          );
-      },
-    );
+  void initState() {
+    _revisionHistoryScrollController = ScrollController();
+    super.initState();
   }
 }

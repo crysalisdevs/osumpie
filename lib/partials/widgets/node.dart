@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 // flutter packages pub run build_runner watch --delete-conflicting-outputs
@@ -50,7 +51,11 @@ class _RecipeNodeState extends State<RecipeNode> {
       bottom: widget.bottom,
       width: widget.width,
       height: widget.height,
-      child: Text(widget.title),
+      child: GradientCard(
+        child: Column(
+          children: [Text(widget.title)],
+        ),
+      ),
     );
   }
 }
