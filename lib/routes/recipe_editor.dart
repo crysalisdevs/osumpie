@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:floating_action_row/floating_action_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:uuid/uuid.dart';
@@ -58,6 +60,101 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
     return _nodes;
   }
 
+  // get the list of all the job extension paths
+  Future<List<FileSystemEntity>> listExtensions() {
+    var files = <FileSystemEntity>[];
+    var completer = Completer<List<FileSystemEntity>>();
+    var lister = Directory('extensions/').list(recursive: true);
+    lister.listen((file) => files.add(file),
+        // should also register onError
+        onDone: () => completer.complete(files));
+    return completer.future;
+  }
+
+  Map<String, Map<String, Object>> allNodeExtensions = {};
+
+  // get the json files load them and include the job blocks when listing the jobs.
+  Future<List<String>> createJobBlock() async {
+    List<String> nodeTemplates = [];
+    final extensions = await listExtensions();
+    for (int i = 0; i < extensions.length; i++) {
+      if (await File(extensions[i].path).exists()) {
+        String jsonSource = await File(extensions[i].path).readAsString();
+        Map<String, Object> json = jsonDecode(jsonSource);
+        allNodeExtensions.addAll({json['title']: json});
+        nodeTemplates.add(json['title']);
+      }
+    }
+    return nodeTemplates;
+  }
+
+  Widget get toolBar => Positioned(
+      right: 10,
+      child: SlideInDown(
+        preferences: AnimationPreferences(offset: Duration(milliseconds: 200)),
+        child: FloatingActionRow(
+          color: Colors.black,
+          children: <Widget>[
+            // Add job button
+            FutureBuilder<List<String>>(
+                future: createJobBlock(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData)
+                    return PopupMenuButton<String>(
+                        tooltip: 'Add a job',
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Icon(Icons.add, color: Colors.white),
+                        ),
+                        onSelected: (value) => setState(() => _nodes.add(RecipeNode(
+                              top: 10,
+                              left: 10,
+                              width: allNodeExtensions[value]['width'],
+                              height: allNodeExtensions[value]['height'],
+                              title: value,
+                              description: allNodeExtensions[value]['description'],
+                              properties: allNodeExtensions[value]['properties'],
+                              author: allNodeExtensions[value]['author'],
+                              gitUpdathPath: null, //allNodeExtensions[value]['gitUpdathPath'],
+                              isDisabled: false,
+                            ))),
+                        itemBuilder: (context) => snapshot.data
+                            .map((String value) => PopupMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                ))
+                            .toList());
+                  else if (snapshot.hasError) return Icon(Icons.error);
+                  return CircularProgressIndicator();
+                }),
+            FloatingActionRowDivider(),
+            FloatingActionButton(
+                onPressed: saveNodes,
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                tooltip: 'Save',
+                child: Icon(Icons.save)),
+            FloatingActionRowDivider(),
+            FloatingActionButton(
+                onPressed: () {},
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                tooltip: 'Delete Job',
+                child: Icon(Icons.delete)),
+            FloatingActionRowDivider(),
+            FloatingActionButton(
+                onPressed: runProject,
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                tooltip: 'Run',
+                child: AnimatedIcon(
+                  icon: AnimatedIcons.play_pause,
+                  progress: _runAnimationController,
+                )),
+          ],
+        ),
+      ));
+
   @override
   void initState() {
     super.initState();
@@ -67,47 +164,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
     );
     _nodes = [];
     _nodesFile = File('test.json');
-    _nodes.addAll([
-      Positioned(
-        right: 150,
-        child: BounceIn(
-          child: FloatingActionButton(
-            tooltip: 'Save receipe',
-            child: Icon(Icons.save),
-            onPressed: saveNodes,
-          ),
-        ),
-      ),
-      Positioned(
-          right: 80,
-          child: BounceIn(
-              child: FloatingActionButton(
-                  tooltip: 'Add recipe block',
-                  child: Icon(Icons.add),
-                  onPressed: () => setState(() => _nodes.add(
-                          RecipeNode(
-                            description: '',
-                            left: 0,
-                            properties: {},
-                            title: 'Hi',
-                            width: 200,
-                            height: 100,
-                            top: 0,
-                          ),
-                        ))))),
-      Positioned(
-        right: 10,
-        child: BounceIn(
-          child: FloatingActionButton(
-              onPressed: runProject,
-              tooltip: 'Run the project',
-              child: AnimatedIcon(
-                icon: AnimatedIcons.play_pause,
-                progress: _runAnimationController,
-              )),
-        ),
-      ),
-    ]);
+    _nodes.add(toolBar);
   }
 
   void runProject() {

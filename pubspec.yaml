@@ -17,9 +17,10 @@ dependencies:
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
   gradient_widgets: ^0.5.1
-  percent_indicator: ^2.1.7+2
   flutter_animator: ^2.1.0
   json_serializable: ^3.5.0
+  percent_indicator: ^2.1.7+2
+  floating_action_row: ^0.1.0
   draggable_scrollbar: ^0.0.4
   shared_preferences: ^0.5.12+2
   linked_scroll_controller: ^0.1.2
