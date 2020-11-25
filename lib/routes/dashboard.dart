@@ -2,7 +2,6 @@ import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:mqtt_client/mqtt_client.dart';
 import 'package:osumpie/partials/service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,7 +24,6 @@ class DashboardRoute extends StatefulWidget {
 
 class _DashboardRouteState extends State<DashboardRoute> {
   Settings _settings;
-  MqttClientConnectionStatus _connectionStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +46,9 @@ class _DashboardRouteState extends State<DashboardRoute> {
             child: IconButton(
                 icon: Icon(Icons.brightness_2),
                 onPressed: () => DynamicTheme.of(context).setBrightness(
-                      Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Brightness.light
+                          : Brightness.dark,
                     )),
           ),
         ]),
@@ -56,7 +56,9 @@ class _DashboardRouteState extends State<DashboardRoute> {
           contentChild: TabBarView(children: loadTabContent(setState)),
           tabChild: SizedBox(
               width: _settings != null
-                  ? MediaQuery.of(context).size.width + 10 - _settings.sideNavWidth / 2
+                  ? MediaQuery.of(context).size.width +
+                      10 -
+                      _settings.sideNavWidth / 2
                   : MediaQuery.of(context).size.width,
               child: CupertinoScrollbar(
                   child: Padding(
@@ -74,7 +76,11 @@ class _DashboardRouteState extends State<DashboardRoute> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: IconButton(
-                    color: DynamicTheme.of(context).data.appBarTheme.iconTheme.color,
+                    color: DynamicTheme.of(context)
+                        .data
+                        .appBarTheme
+                        .iconTheme
+                        .color,
                     icon: Icon(Icons.file_copy, size: 30),
                     onPressed: () {},
                   ),
@@ -99,7 +105,7 @@ class _DashboardRouteState extends State<DashboardRoute> {
     final storage = await SharedPreferences.getInstance();
     setState(() => _settings = Settings(storage));
     // Setup up for BSI
-    _connectionStatus = await Mqtt().initialize(
+    await Mqtt().initialize(
         using: MqttConnection.from(
       service: OsumPieService.instance.reference,
       broker: "127.0.0.1",
