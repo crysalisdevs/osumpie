@@ -2,7 +2,11 @@ import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:osumpie/partials/service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:bsi_dart/bsi_dart.dart';
 
 import '../globals.dart';
 import '../partials/settings.dart';
@@ -21,6 +25,7 @@ class DashboardRoute extends StatefulWidget {
 
 class _DashboardRouteState extends State<DashboardRoute> {
   Settings _settings;
+  MqttClientConnectionStatus _connectionStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +95,16 @@ class _DashboardRouteState extends State<DashboardRoute> {
   }
 
   void initAsync() async {
+    // Load the settings
     final storage = await SharedPreferences.getInstance();
     setState(() => _settings = Settings(storage));
+    // Setup up for BSI
+    _connectionStatus = await Mqtt().initialize(
+        using: MqttConnection.from(
+      service: OsumPieService.instance.reference,
+      broker: "127.0.0.1",
+      port: 1883,
+    ));
   }
 
   @override

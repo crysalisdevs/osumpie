@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
 
   uuid: 2.2.2
+  path: ^1.7.0
   filex: ^0.2.2
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
@@ -27,6 +28,9 @@ dependencies:
 
   bakecode_jobs:
     path: bakecode-jobs/
+
+  bsi_dart:
+    path: bsi-dart/
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 // flutter packages pub run build_runner watch --delete-conflicting-outputs
 
@@ -47,18 +45,85 @@ class RecipeNode extends StatefulWidget {
   _RecipeNodeState createState() => _RecipeNodeState();
 }
 
+class CircleButton extends StatefulWidget {
+  final GestureTapCallback onTap;
+  final bool isConnected;
+
+  const CircleButton({Key key, this.onTap, this.isConnected}) : super(key: key);
+
+  @override
+  _CircleButtonState createState() => _CircleButtonState();
+}
+
+class _CircleButtonState extends State<CircleButton> {
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Container(
+          width: 15.0,
+          height: 15.0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.blueGrey[200]),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RecipeNodeState extends State<RecipeNode> {
   GlobalKey _key = GlobalKey();
   double _xOff;
   double _yOff;
 
-  Widget get buildNodeUi => GradientCard(
-      gradient: Gradients.deepSpace,
-      child: Center(
-        child: Text(
-          "Hi",
-          style: TextStyle(
-            color: Colors.white,
+  Widget get buildNodeUi => Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: Colors.blueGrey[50],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onDoubleTap: () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CircleButton(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.title,
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    widget.description,
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Text(
+                    '@${widget.author}',
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 10.0,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+              CircleButton(),
+            ],
           ),
         ),
       ));
@@ -73,12 +138,12 @@ class _RecipeNodeState extends State<RecipeNode> {
       height: widget.height,
       child: Draggable(
         child: buildNodeUi,
-        feedback: SizedBox(
-          width: widget.width + 10,
-          height: widget.height + 10,
+        feedback: Container(
+          width: widget.width,
+          height: widget.height,
           child: buildNodeUi,
         ),
-        childWhenDragging: buildNodeUi,
+        childWhenDragging: Container(),
         onDragEnd: (drag) {
           setState(() {
             widget.top = drag.offset.dy - _yOff;
