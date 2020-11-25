@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:floating_action_row/floating_action_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
+import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
 import '../partials/widgets/error_msg.dart';
@@ -23,14 +24,20 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   File _nodesFile;
   AnimationController _runAnimationController;
 
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Widget>>(
       future: initAsync(),
       builder: (context, snapshot) {
         if (snapshot.hasError || snapshot.data == null)
-          return OsumPieErrorMsg(
-            error: snapshot.error ?? 'No recipe? Add recipe block!',
+          return Stack(
+            children: [
+              OsumPieErrorMsg(
+                error: snapshot.error ?? 'No recipe? Add recipe block!',
+              ),
+              toolBar
+            ],
           );
         else if (snapshot.hasData)
           return Stack(
@@ -54,8 +61,15 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       await _nodesFile.create();
     } else {
       String fileContents = await _nodesFile.readAsString();
-      Map<String, dynamic> nodeJson = jsonDecode(fileContents);
-      nodeJson.forEach((key, value) => _nodes.add(RecipeNode.fromJson(value)));
+      try {
+        Map<String, dynamic> nodeJson = jsonDecode(fileContents);
+        nodeJson.forEach((key, value) => _nodes.add(RecipeNode.fromJson(value)));
+      } on FormatException catch (e) {
+        if (e.message == 'Unexpected end of input')
+          return null;
+        else
+          throw e;
+      }
     }
     return _nodes;
   }
@@ -73,12 +87,12 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
 
   Map<String, Map<String, Object>> allNodeExtensions = {};
 
-  // get the json files load them and include the job blocks when listing the jobs.
+  // get the json files load and include the job blocks when listing the jobs.
   Future<List<String>> createJobBlock() async {
     List<String> nodeTemplates = [];
     final extensions = await listExtensions();
     for (int i = 0; i < extensions.length; i++) {
-      if (await File(extensions[i].path).exists()) {
+      if (await File(extensions[i].path).exists() && extension(extensions[i].path) == '.json') {
         String jsonSource = await File(extensions[i].path).readAsString();
         Map<String, Object> json = jsonDecode(jsonSource);
         allNodeExtensions.addAll({json['title']: json});
@@ -133,7 +147,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
                 tooltip: 'Save',
-                child: Icon(Icons.save)),
+                child: Icon(Icons.point_of_sale)),
             FloatingActionRowDivider(),
             FloatingActionButton(
                 onPressed: () {},
@@ -174,6 +188,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       _runAnimationController.forward();
   }
 
+  // save the node setup to a file
   Future<void> saveNodes() async {
     Map<String, dynamic> jsonData = {};
     if (!await _nodesFile.exists()) {
