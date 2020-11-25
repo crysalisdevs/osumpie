@@ -11,5 +11,5 @@ class OsumPieService extends Service {
   factory OsumPieService() => instance;
 
   @override
-  ServiceReference get reference => ServiceReference.root('osumpie');
+  ServiceReference get reference => Services.OsumPie;
 }
