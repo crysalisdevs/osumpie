@@ -8,99 +8,24 @@ import 'package:flutter_animator/flutter_animator.dart';
 import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
+import '../globals.dart';
 import '../partials/widgets/error_msg.dart';
 import '../partials/widgets/loading_msg.dart';
-import '../partials/widgets/node.dart';
+import '../partials/widgets/node_widget.dart';
 
 class RecipeEditor extends StatefulWidget {
-  RecipeEditor({Key key}) : super(key: key);
+  final File file;
+
+  RecipeEditor({Key key, @required this.file}) : super(key: key);
 
   @override
   _RecipeEditorState createState() => _RecipeEditorState();
 }
 
 class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderStateMixin {
-  List<Widget> _nodes;
-  File _nodesFile;
+  List<Widget> _widgets = [];
   AnimationController _runAnimationController;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Widget>>(
-      future: initAsync(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError || snapshot.data == null)
-          return Stack(
-            children: [
-              OsumPieErrorMsg(
-                error: snapshot.error ?? 'No recipe? Add recipe block!',
-              ),
-              toolBar
-            ],
-          );
-        else if (snapshot.hasData)
-          return Stack(
-            children: snapshot.data,
-          );
-        return const OsumPieLoadingMsg(
-          loadingMsg: 'Loading receipe...',
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _runAnimationController?.dispose();
-    super.dispose();
-  }
-
-  Future<List<Widget>> initAsync() async {
-    if (!await _nodesFile.exists()) {
-      await _nodesFile.create();
-    } else {
-      String fileContents = await _nodesFile.readAsString();
-      try {
-        Map<String, dynamic> nodeJson = jsonDecode(fileContents);
-        nodeJson.forEach((key, value) => _nodes.add(RecipeNode.fromJson(value)));
-      } on FormatException catch (e) {
-        if (e.message == 'Unexpected end of input')
-          return null;
-        else
-          throw e;
-      }
-    }
-    return _nodes;
-  }
-
-  // get the list of all the job extension paths
-  Future<List<FileSystemEntity>> listExtensions() {
-    var files = <FileSystemEntity>[];
-    var completer = Completer<List<FileSystemEntity>>();
-    var lister = Directory('extensions/').list(recursive: true);
-    lister.listen((file) => files.add(file),
-        // should also register onError
-        onDone: () => completer.complete(files));
-    return completer.future;
-  }
-
-  Map<String, Map<String, Object>> allNodeExtensions = {};
-
-  // get the json files load and include the job blocks when listing the jobs.
-  Future<List<String>> createJobBlock() async {
-    List<String> nodeTemplates = [];
-    final extensions = await listExtensions();
-    for (int i = 0; i < extensions.length; i++) {
-      if (await File(extensions[i].path).exists() && extension(extensions[i].path) == '.json') {
-        String jsonSource = await File(extensions[i].path).readAsString();
-        Map<String, Object> json = jsonDecode(jsonSource);
-        allNodeExtensions.addAll({json['title']: json});
-        nodeTemplates.add(json['title']);
-      }
-    }
-    return nodeTemplates;
-  }
+  Map<String, Map<String, dynamic>> _availableJobBlocks = {};
 
   Widget get toolBar => Positioned(
       right: 10,
@@ -111,7 +36,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           children: <Widget>[
             // Add job button
             FutureBuilder<List<String>>(
-                future: createJobBlock(),
+                future: listJobs(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData)
                     return PopupMenuButton<String>(
@@ -120,18 +45,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                           padding: EdgeInsets.all(10.0),
                           child: Icon(Icons.add, color: Colors.white),
                         ),
-                        onSelected: (value) => setState(() => _nodes.add(RecipeNode(
-                              top: 10,
-                              left: 10,
-                              width: allNodeExtensions[value]['width'],
-                              height: allNodeExtensions[value]['height'],
-                              title: value,
-                              description: allNodeExtensions[value]['description'],
-                              properties: allNodeExtensions[value]['properties'],
-                              author: allNodeExtensions[value]['author'],
-                              gitUpdathPath: null, //allNodeExtensions[value]['gitUpdathPath'],
-                              isDisabled: false,
-                            ))),
+                        onSelected: addJob,
                         itemBuilder: (context) => snapshot.data
                             .map((String value) => PopupMenuItem<String>(
                                   value: value,
@@ -143,7 +57,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                 }),
             FloatingActionRowDivider(),
             FloatingActionButton(
-                onPressed: saveNodes,
+                onPressed: saveReceipeFile,
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
                 tooltip: 'Save',
@@ -169,6 +83,57 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         ),
       ));
 
+  bool _reFuturelock = false;
+
+  void addJob(String value) => setState(() => _widgets.add(
+        NodeBlock(
+          top: 10,
+          left: 10,
+          width: _availableJobBlocks[value]['width'],
+          height: _availableJobBlocks[value]['height'],
+          title: value,
+          description: _availableJobBlocks[value]['description'],
+          properties: _availableJobBlocks[value]['properties'],
+          author: _availableJobBlocks[value]['author'],
+          myUuid: Uuid().v4(),
+          leftUuid: null,
+          rightUuid: null,
+        ),
+      ));
+
+  final stackKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<List<Widget>>(
+        future: loadReceipeFile(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError || snapshot.data == null)
+            return Stack(
+              children: [
+                OsumPieErrorMsg(
+                  error: snapshot.error ?? 'No recipe? Add recipe block!',
+                ),
+                toolBar
+              ],
+            );
+          else if (snapshot.hasData)
+            return Stack(
+              key: stackKey,
+              children: [toolBar]..addAll(snapshot.data),
+            );
+          return const OsumPieLoadingMsg(
+            loadingMsg: 'Loading receipe...',
+          );
+        },
+      );
+
+  // get the list of all the job extension paths
+  @override
+  void dispose() {
+    _runAnimationController?.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -176,11 +141,76 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _nodes = [];
-    _nodesFile = File('test.json');
-    _nodes.add(toolBar);
   }
 
+  // get the json files load and include the job blocks when listing the jobs.
+  Future<List<FileSystemEntity>> listExtensions() {
+    var files = <FileSystemEntity>[];
+    var completer = Completer<List<FileSystemEntity>>();
+    var lister = Directory('extensions/').list(recursive: true);
+    lister.listen((file) => files.add(file),
+        // should also register onError
+        onDone: () => completer.complete(files));
+    return completer.future;
+  }
+
+  Future<List<String>> listJobs() async {
+    List<String> nodeTemplates = [];
+    final extensions = await listExtensions();
+    for (int i = 0; i < extensions.length; i++) {
+      if (await File(extensions[i].path).exists() && extension(extensions[i].path) == '.json') {
+        String jsonSource = await File(extensions[i].path).readAsString();
+        Map<String, Object> json = jsonDecode(jsonSource);
+        _availableJobBlocks.addAll({json['title']: json});
+        nodeTemplates.add(json['title']);
+      }
+    }
+    return nodeTemplates;
+  }
+
+  Future<List<Widget>> loadReceipeFile() async {
+    if (!_reFuturelock) {
+      _reFuturelock = true;
+      renderLines();
+      if (!await widget.file.exists()) {
+        await widget.file.create();
+      } else {
+        String fileContents = await widget.file.readAsString();
+        try {
+          Map<String, dynamic> nodes = jsonDecode(fileContents);
+          nodes.forEach((uuid, nodeData) {
+            _widgets.add(NodeBlock.fromJson(nodeData));
+          });
+        } on FormatException catch (e) {
+          if (e.message == 'Unexpected end of input')
+            return null;
+          else
+            throw e;
+        }
+      }
+    }
+    return _widgets;
+  }
+
+  void renderLines() {
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      _widgets.removeWhere((widgetInside) => widgetInside is CustomPaint);
+      if (selectedForLines.length % 2 == 0 && selectedForLines.length >= 2)
+        for (int i = 0; i < selectedForLines.length; i += 2) {
+          print(selectedForLines);
+          
+          setState(() {
+            _widgets.add(CustomPaint(
+                painter: NodeConnectionLines(
+              [selectedForLines[i + 1].left, selectedForLines[i + 1].top],
+              [selectedForLines[i].left, selectedForLines[i].top],
+            )));
+          });
+        }
+    });
+  }
+
+  // save the node setup to a file
   void runProject() {
     if (_runAnimationController.isCompleted)
       _runAnimationController.reverse();
@@ -188,17 +218,16 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       _runAnimationController.forward();
   }
 
-  // save the node setup to a file
-  Future<void> saveNodes() async {
-    Map<String, dynamic> jsonData = {};
-    if (!await _nodesFile.exists()) {
-      await _nodesFile.create();
-    }
-    _nodes.forEach((element) {
-      if (element is RecipeNode) {
-        jsonData.addAll({Uuid().v4(): element.toJson()});
+  Future<void> saveReceipeFile() async {
+    if (!await widget.file.exists()) await widget.file.create();
+    var nodeBlocks = {};
+    _widgets.forEach((widget) {
+      if (widget is NodeBlock) {
+        nodeBlocks.addAll({
+          widget.myUuid: widget.toJson(),
+        });
       }
     });
-    _nodesFile.writeAsString(jsonEncode(jsonData));
+    widget.file.writeAsString(jsonEncode(nodeBlocks));
   }
 }
