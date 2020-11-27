@@ -15,6 +15,7 @@ dependencies:
   uuid: 2.2.2
   path: ^1.7.0
   filex: ^0.2.2
+  arrow_path: ^1.0.0
   google_fonts: ^1.1.1
   dynamic_theme: ^1.0.0
   gradient_widgets: ^0.5.1

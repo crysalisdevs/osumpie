@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:json_annotation/json_annotation.dart';
-
-import '../../globals.dart';
 
 part 'node_widget.g.dart';
 
@@ -57,7 +54,7 @@ class NodeConnectionLines extends CustomPainter {
     final _p1 = Offset(p1[0], p1[1]);
     final _p2 = Offset(p2[0], p2[1]);
     final _paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.grey
       ..strokeWidth = 4;
     canvas.drawLine(_p1, _p2, _paint);
   }
@@ -75,6 +72,12 @@ class NodeBlock extends StatefulWidget {
   String title, author, description, myUuid, leftUuid, rightUuid;
   Map<String, dynamic> properties;
 
+  @JsonKey(ignore: true)
+  void Function() renderLinesCallback;
+
+  @JsonKey(ignore: true)
+  List<NodeBlock> nodeBlocks;
+
   NodeBlock({
     @required this.top,
     @required this.left,
@@ -87,9 +90,17 @@ class NodeBlock extends StatefulWidget {
     @required this.myUuid,
     @required this.properties,
     @required this.rightUuid,
+    @required this.nodeBlocks,
+    @required this.renderLinesCallback,
   });
 
-  factory NodeBlock.fromJson(Map<String, dynamic> item) => _$NodeBlockFromJson(item);
+  factory NodeBlock.fromJson(
+      Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks) {
+    NodeBlock generated = _$NodeBlockFromJson(item);
+    generated.renderLinesCallback = renderLinesCallback;
+    generated.nodeBlocks = nodeBlocks;
+    return generated;
+  }
   Map<String, dynamic> toJson() => _$NodeBlockToJson(this);
 
   @override
@@ -118,7 +129,10 @@ class _NodeBlockState extends State<NodeBlock> {
             children: [
               CircleButton(
                 isConnected: isConnectedLeft,
-                onTap: () => selectedForLines.add(widget),
+                onTap: () {
+                  widget.nodeBlocks.add(widget);
+                  widget.renderLinesCallback();
+                },
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -151,7 +165,10 @@ class _NodeBlockState extends State<NodeBlock> {
               ),
               CircleButton(
                 isConnected: isConnectedRight,
-                onTap: () => selectedForLines.add(widget),
+                onTap: () {
+                  widget.nodeBlocks.add(widget);
+                  widget.renderLinesCallback();
+                },
               ),
             ],
           ),
@@ -172,10 +189,15 @@ class _NodeBlockState extends State<NodeBlock> {
             height: widget.height,
             child: buildNodeUi,
           ),
-          childWhenDragging: Container(),
+          childWhenDragging: Container(
+            width: widget.width,
+            height: widget.height,
+            child: buildNodeUi,
+          ),
           onDragEnd: (drag) => setState(() {
             widget.top = drag.offset.dy - _yOff;
             widget.left = drag.offset.dx - _xOff;
+            widget.renderLinesCallback();
           }),
         ),
       );

@@ -19,5 +19,3 @@ Map<String, List<Object>> menus = {
   "Run": [Icons.play_arrow, null],
   "Help": [Icons.help, null],
 };
-
-List<NodeBlock> selectedForLines = [];

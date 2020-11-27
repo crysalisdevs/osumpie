@@ -8,7 +8,6 @@ import 'package:flutter_animator/flutter_animator.dart';
 import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
-import '../globals.dart';
 import '../partials/widgets/error_msg.dart';
 import '../partials/widgets/loading_msg.dart';
 import '../partials/widgets/node_widget.dart';
@@ -26,6 +25,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   List<Widget> _widgets = [];
   AnimationController _runAnimationController;
   Map<String, Map<String, dynamic>> _availableJobBlocks = {};
+  List<NodeBlock> selectedForLines = [];
 
   Widget get toolBar => Positioned(
       right: 10,
@@ -98,6 +98,8 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           myUuid: Uuid().v4(),
           leftUuid: null,
           rightUuid: null,
+          renderLinesCallback: renderLines,
+          nodeBlocks: selectedForLines,
         ),
       ));
 
@@ -171,7 +173,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   Future<List<Widget>> loadReceipeFile() async {
     if (!_reFuturelock) {
       _reFuturelock = true;
-      renderLines();
+      //renderLines();
       if (!await widget.file.exists()) {
         await widget.file.create();
       } else {
@@ -179,7 +181,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         try {
           Map<String, dynamic> nodes = jsonDecode(fileContents);
           nodes.forEach((uuid, nodeData) {
-            _widgets.add(NodeBlock.fromJson(nodeData));
+            _widgets.add(NodeBlock.fromJson(nodeData, renderLines, selectedForLines));
           });
         } on FormatException catch (e) {
           if (e.message == 'Unexpected end of input')
@@ -193,21 +195,22 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   }
 
   void renderLines() {
-    Timer.periodic(Duration(seconds: 1), (Timer t) {
-      _widgets.removeWhere((widgetInside) => widgetInside is CustomPaint);
-      if (selectedForLines.length % 2 == 0 && selectedForLines.length >= 2)
-        for (int i = 0; i < selectedForLines.length; i += 2) {
-          print(selectedForLines);
-          
-          setState(() {
-            _widgets.add(CustomPaint(
-                painter: NodeConnectionLines(
-              [selectedForLines[i + 1].left, selectedForLines[i + 1].top],
-              [selectedForLines[i].left, selectedForLines[i].top],
-            )));
-          });
-        }
-    });
+    _widgets.removeWhere((widgetInside) => widgetInside is CustomPaint);
+    if (selectedForLines.length % 2 == 0 && selectedForLines.length >= 2)
+      for (int i = 0; i < selectedForLines.length; i += 2)
+        setState(
+          () => _widgets.insert(
+              0,
+              CustomPaint(
+                  painter: NodeConnectionLines([
+                selectedForLines[i + 1].left + selectedForLines[i + 1].width / 2,
+                selectedForLines[i + 1].top + selectedForLines[i + 1].height / 2
+              ], [
+                selectedForLines[i].left + selectedForLines[i].width / 2,
+                selectedForLines[i].top + selectedForLines[i].height / 2
+              ])),
+            ),
+        );
   }
 
   // save the node setup to a file
