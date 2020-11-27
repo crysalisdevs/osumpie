@@ -73,32 +73,33 @@ class NodeBlock extends StatefulWidget {
   Map<String, dynamic> properties;
 
   @JsonKey(ignore: true)
-  void Function() renderLinesCallback;
+  void Function() renderLinesCallback, saveReceipeFileCallback;
 
   @JsonKey(ignore: true)
   List<NodeBlock> nodeBlocks;
 
-  NodeBlock({
-    @required this.top,
-    @required this.left,
-    @required this.title,
-    @required this.author,
-    @required this.width,
-    @required this.height,
-    @required this.leftUuid,
-    @required this.description,
-    @required this.myUuid,
-    @required this.properties,
-    @required this.rightUuid,
-    @required this.nodeBlocks,
-    @required this.renderLinesCallback,
-  });
+  NodeBlock(
+      {@required this.top,
+      @required this.left,
+      @required this.title,
+      @required this.author,
+      @required this.width,
+      @required this.height,
+      @required this.leftUuid,
+      @required this.description,
+      @required this.myUuid,
+      @required this.properties,
+      @required this.rightUuid,
+      @required this.nodeBlocks,
+      @required this.renderLinesCallback,
+      @required this.saveReceipeFileCallback});
 
-  factory NodeBlock.fromJson(
-      Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks) {
+  factory NodeBlock.fromJson(Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks,
+      void Function() saveReceipeFileCallback) {
     NodeBlock generated = _$NodeBlockFromJson(item);
     generated.renderLinesCallback = renderLinesCallback;
     generated.nodeBlocks = nodeBlocks;
+    generated.saveReceipeFileCallback = saveReceipeFileCallback;
     return generated;
   }
   Map<String, dynamic> toJson() => _$NodeBlockToJson(this);

@@ -26,6 +26,9 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   AnimationController _runAnimationController;
   Map<String, Map<String, dynamic>> _availableJobBlocks = {};
   List<NodeBlock> selectedForLines = [];
+  bool _reFuturelock = false;
+  final stackKey = GlobalKey();
+  final scrollController = ScrollController();
 
   Widget get toolBar => Positioned(
       right: 10,
@@ -55,13 +58,13 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                   else if (snapshot.hasError) return Icon(Icons.error);
                   return CircularProgressIndicator();
                 }),
-            FloatingActionRowDivider(),
-            FloatingActionButton(
-                onPressed: saveReceipeFile,
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                tooltip: 'Save',
-                child: Icon(Icons.point_of_sale)),
+            // FloatingActionRowDivider(),
+            // FloatingActionButton(
+            //     onPressed: saveReceipeFile,
+            //     backgroundColor: Colors.transparent,
+            //     foregroundColor: Colors.white,
+            //     tooltip: 'Save',
+            //     child: Icon(Icons.point_of_sale)),
             FloatingActionRowDivider(),
             FloatingActionButton(
                 onPressed: () {},
@@ -82,10 +85,8 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           ],
         ),
       ));
-
-  bool _reFuturelock = false;
-
-  void addJob(String value) => setState(() => _widgets.add(
+  void addJob(String value) {
+    setState(() => _widgets.add(
         NodeBlock(
           top: 10,
           left: 10,
@@ -100,10 +101,11 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           rightUuid: null,
           renderLinesCallback: renderLines,
           nodeBlocks: selectedForLines,
+          saveReceipeFileCallback: saveReceipeFile,
         ),
       ));
-
-  final stackKey = GlobalKey();
+      saveReceipeFile();
+  }
 
   @override
   Widget build(BuildContext context) => FutureBuilder<List<Widget>>(
@@ -119,9 +121,19 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
               ],
             );
           else if (snapshot.hasData)
-            return Stack(
-              key: stackKey,
-              children: [toolBar]..addAll(snapshot.data),
+            return SingleChildScrollView(
+              controller: scrollController,
+              child: Scrollbar(
+                controller: scrollController,
+                isAlwaysShown: true,
+                child: SizedBox(
+                  height: 5000,
+                  child: Stack(
+                    key: stackKey,
+                    children: [toolBar]..addAll(snapshot.data),
+                  ),
+                ),
+              ),
             );
           return const OsumPieLoadingMsg(
             loadingMsg: 'Loading receipe...',
@@ -173,16 +185,15 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   Future<List<Widget>> loadReceipeFile() async {
     if (!_reFuturelock) {
       _reFuturelock = true;
-      //renderLines();
       if (!await widget.file.exists()) {
         await widget.file.create();
       } else {
         String fileContents = await widget.file.readAsString();
         try {
           Map<String, dynamic> nodes = jsonDecode(fileContents);
-          nodes.forEach((uuid, nodeData) {
-            _widgets.add(NodeBlock.fromJson(nodeData, renderLines, selectedForLines));
-          });
+          nodes.forEach((uuid, nodeData) => _widgets.add(
+                NodeBlock.fromJson(nodeData, renderLines, selectedForLines, saveReceipeFile),
+              ));
         } on FormatException catch (e) {
           if (e.message == 'Unexpected end of input')
             return null;
@@ -191,26 +202,42 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         }
       }
     }
+    // Connection line logic
+    _widgets.forEach((widget) {
+      if (widget is NodeBlock) {
+        if (widget.rightUuid != null) {
+          selectedForLines.add(widget);
+          final otherNode = List<NodeBlock>.from(_widgets.where((widget2) {
+            if (widget2 is NodeBlock) return widget2.myUuid == widget.rightUuid;
+            return false;
+          }).toList());
+          selectedForLines.addAll(otherNode);
+        }
+      }
+    });
+    renderLines();
     return _widgets;
   }
 
   void renderLines() {
     _widgets.removeWhere((widgetInside) => widgetInside is CustomPaint);
     if (selectedForLines.length % 2 == 0 && selectedForLines.length >= 2)
-      for (int i = 0; i < selectedForLines.length; i += 2)
+      for (int i = 0; i < selectedForLines.length; i += 2) {
         setState(
           () => _widgets.insert(
-              0,
-              CustomPaint(
-                  painter: NodeConnectionLines([
-                selectedForLines[i + 1].left + selectedForLines[i + 1].width / 2,
-                selectedForLines[i + 1].top + selectedForLines[i + 1].height / 2
-              ], [
-                selectedForLines[i].left + selectedForLines[i].width / 2,
-                selectedForLines[i].top + selectedForLines[i].height / 2
-              ])),
-            ),
+            0,
+            CustomPaint(
+                painter: NodeConnectionLines([
+              selectedForLines[i + 1].left + selectedForLines[i + 1].width / 2,
+              selectedForLines[i + 1].top + selectedForLines[i + 1].height / 2
+            ], [
+              selectedForLines[i].left + selectedForLines[i].width / 2,
+              selectedForLines[i].top + selectedForLines[i].height / 2
+            ])),
+          ),
         );
+        selectedForLines[i].rightUuid = selectedForLines[i + 1].myUuid;
+      }
   }
 
   // save the node setup to a file

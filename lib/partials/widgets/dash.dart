@@ -10,11 +10,7 @@ const sideNavBorderWidth = 10.0;
 
 /// The dashboard widget that holds the sidenav and content widget.
 class DashboardLayout extends StatefulWidget {
-  final Widget tabChild;
-  final Widget contentChild;
-  final Widget sidenavChild;
-  final Widget statusBarChild;
-  final Widget sidenavIconsChild;
+  final Widget tabChild, contentChild, sidenavChild, statusBarChild, sidenavIconsChild;
 
   DashboardLayout({this.sidenavChild, this.tabChild, this.contentChild, this.statusBarChild, this.sidenavIconsChild});
 
@@ -126,8 +122,7 @@ class SideNavBorder extends StatefulWidget {
 }
 
 class _SideNavBorderState extends State<SideNavBorder> {
-  double _initX;
-  double _initY;
+  double _initX, _initY;
 
   @override
   Widget build(BuildContext context) {
