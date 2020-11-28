@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'routes/hardware_monitor.dart';
@@ -18,3 +19,5 @@ Map<String, List<Object>> menus = {
 Map<String, Object> osumTabs = {
   "Receipe Editor": RecipeEditor(file: File('test.json')),
 };
+
+final isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS || kIsWeb;

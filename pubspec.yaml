@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  uuid: 2.2.2
+  uuid: ^2.2.2
   path: ^1.7.0
   filex: ^0.2.2
   arrow_path: ^1.0.0

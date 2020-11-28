@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:floating_action_row/floating_action_row.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
+import 'package:osumpie/globals.dart';
 import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
@@ -112,10 +115,13 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
             renderLinesCallback: renderLines,
             nodeBlocks: selectedForLines,
             saveReceipeFileCallback: saveReceipeFile,
+            lockEditorPan: lockEditorPan,
           ),
         ));
     saveReceipeFile();
   }
+
+  bool lockEditorPan = false;
 
   @override
   Widget build(BuildContext context) => FutureBuilder<List<Widget>>(
@@ -131,18 +137,22 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
               ],
             );
           else if (snapshot.hasData)
+            // Disabling the panning when scroll feature in desktop as it is hard
+            // to pan node because it will pan the editor also.
             return Scrollbar(
               controller: scrollController,
               isAlwaysShown: true,
               child: SingleChildScrollView(
                 controller: scrollController,
                 scrollDirection: Axis.horizontal,
+                physics: lockEditorPan ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
                 child: Scrollbar(
                   controller: scrollController2,
                   isAlwaysShown: true,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     controller: scrollController2,
+                    physics: lockEditorPan ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
                     child: SizedBox(
                       height: 5000,
                       width: 5000,
@@ -212,7 +222,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         try {
           Map<String, dynamic> nodes = jsonDecode(fileContents);
           nodes.forEach((uuid, nodeData) => _widgets.add(
-                NodeBlock.fromJson(nodeData, renderLines, selectedForLines, saveReceipeFile),
+                NodeBlock.fromJson(nodeData, renderLines, selectedForLines, saveReceipeFile, lockEditorPan),
               ));
         } on FormatException catch (e) {
           if (e.message == 'Unexpected end of input')

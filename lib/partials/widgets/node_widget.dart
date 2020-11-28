@@ -79,28 +79,32 @@ class NodeBlock extends StatefulWidget {
   @JsonKey(ignore: true)
   List<NodeBlock> nodeBlocks;
 
-  NodeBlock({
-    @required this.top,
-    @required this.left,
-    @required this.title,
-    @required this.author,
-    @required this.width,
-    @required this.height,
-    @required this.description,
-    @required this.myUuid,
-    @required this.properties,
-    @required this.rightUuid,
-    @required this.nodeBlocks,
-    @required this.renderLinesCallback,
-    @required this.saveReceipeFileCallback,
-  });
+  @JsonKey(ignore: true)
+  bool lockEditorPan;
+
+  NodeBlock(
+      {@required this.top,
+      @required this.left,
+      @required this.title,
+      @required this.author,
+      @required this.width,
+      @required this.height,
+      @required this.description,
+      @required this.myUuid,
+      @required this.properties,
+      @required this.rightUuid,
+      @required this.nodeBlocks,
+      @required this.renderLinesCallback,
+      @required this.saveReceipeFileCallback,
+      @required this.lockEditorPan});
 
   factory NodeBlock.fromJson(Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks,
-      void Function() saveReceipeFileCallback) {
+      void Function() saveReceipeFileCallback, bool lockEditorPan) {
     NodeBlock generated = _$NodeBlockFromJson(item);
     generated.renderLinesCallback = renderLinesCallback;
     generated.nodeBlocks = nodeBlocks;
     generated.saveReceipeFileCallback = saveReceipeFileCallback;
+    generated.lockEditorPan = lockEditorPan;
     return generated;
   }
   Map<String, dynamic> toJson() => _$NodeBlockToJson(this);
@@ -175,11 +179,15 @@ class _NodeBlockState extends State<NodeBlock> {
       width: widget.width,
       height: widget.height,
       child: GestureDetector(
+        onTap: () => setState(() => widget.lockEditorPan = true),
         onPanUpdate: (details) => setState(() {
           widget.left += details.delta.dx;
           widget.top += details.delta.dy;
         }),
-        onPanEnd: (details) => widget.renderLinesCallback(),
+        onPanEnd: (details) {
+          widget.renderLinesCallback();
+          setState(() => widget.lockEditorPan = true);
+        },
         child: buildNodeUi,
       ),
     );
