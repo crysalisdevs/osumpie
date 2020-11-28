@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import '../partials/widgets/error_msg.dart';
 import '../partials/widgets/loading_msg.dart';
 
-/// Displays the revision history of the [fileName] using git
+/// Displays the revision history of that file.
+///
+/// Pass the [fileName] to get it's history.
 class RevisionHistory extends StatefulWidget {
   final String filename;
 
@@ -18,7 +20,7 @@ class RevisionHistory extends StatefulWidget {
 }
 
 class _RevisionHistoryState extends State<RevisionHistory> {
-  ScrollController _revisionHistoryScrollController;
+  final _revisionHistoryScrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +57,9 @@ class _RevisionHistoryState extends State<RevisionHistory> {
       if (gitCheck.exitCode == 0) {
         // do git versioning
         if (widget.filename != null) {
-          ProcessResult fileVersionResult =
-              await Process.run('git', ['log', '--format=fuller', '--date=local', '-p', widget.filename], runInShell: false);
+          ProcessResult fileVersionResult = await Process.run(
+              'git', ['log', '--format=fuller', '--date=local', '-p', widget.filename],
+              runInShell: false);
           List<Widget> commitMsgWidgets = <Widget>[];
           String result = fileVersionResult.stdout as String;
           List<String> lines = result.split('\n');
@@ -122,11 +125,5 @@ class _RevisionHistoryState extends State<RevisionHistory> {
         return <Widget>[const Text('Git is not installed to work with file versioning')];
     }
     return <Widget>[const Text('File versioning not support on web yet')];
-  }
-
-  @override
-  void initState() {
-    _revisionHistoryScrollController = ScrollController();
-    super.initState();
   }
 }

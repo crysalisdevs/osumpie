@@ -20,6 +20,7 @@ class DashboardRoute extends StatefulWidget {
 }
 
 class _DashboardRouteState extends State<DashboardRoute> {
+  /// Contains the application's global settings.
   Settings _settings;
 
   @override
@@ -89,6 +90,7 @@ class _DashboardRouteState extends State<DashboardRoute> {
     );
   }
 
+  /// Loading the start up logic for dashboard.
   void initAsync() async {
     // Load the settings
     final storage = await SharedPreferences.getInstance();

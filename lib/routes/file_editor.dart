@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 import '../partials/widgets/error_msg.dart';
 import '../partials/widgets/loading_msg.dart';
 
-// TODO: add code hightlighting
+// NOTE: raw editor is deprecated use system default text/code editor instead.
 
-/// A raw file editor widget which loads the file [filename].
+/// A raw file viewer widget which loads the file [filename].
+@deprecated
 class FileRawEditor extends StatefulWidget {
   final String filename;
 

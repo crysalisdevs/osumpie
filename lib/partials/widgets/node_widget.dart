@@ -64,12 +64,13 @@ class NodeConnectionLines extends CustomPainter {
 }
 
 // The node block
-@JsonSerializable(nullable: false)
 // TODO: make node stateless
+
+@JsonSerializable(nullable: false)
 //ignore: must_be_immutable
 class NodeBlock extends StatefulWidget {
   double top, left, height, width;
-  String title, author, description, myUuid, leftUuid, rightUuid;
+  String title, author, description, myUuid, rightUuid;
   Map<String, dynamic> properties;
 
   @JsonKey(ignore: true)
@@ -78,21 +79,21 @@ class NodeBlock extends StatefulWidget {
   @JsonKey(ignore: true)
   List<NodeBlock> nodeBlocks;
 
-  NodeBlock(
-      {@required this.top,
-      @required this.left,
-      @required this.title,
-      @required this.author,
-      @required this.width,
-      @required this.height,
-      @required this.leftUuid,
-      @required this.description,
-      @required this.myUuid,
-      @required this.properties,
-      @required this.rightUuid,
-      @required this.nodeBlocks,
-      @required this.renderLinesCallback,
-      @required this.saveReceipeFileCallback});
+  NodeBlock({
+    @required this.top,
+    @required this.left,
+    @required this.title,
+    @required this.author,
+    @required this.width,
+    @required this.height,
+    @required this.description,
+    @required this.myUuid,
+    @required this.properties,
+    @required this.rightUuid,
+    @required this.nodeBlocks,
+    @required this.renderLinesCallback,
+    @required this.saveReceipeFileCallback,
+  });
 
   factory NodeBlock.fromJson(Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks,
       void Function() saveReceipeFileCallback) {

@@ -9,6 +9,12 @@ import '../../partials/settings.dart';
 const sideNavBorderWidth = 10.0;
 
 /// The dashboard widget that holds the sidenav and content widget.
+/// 
+/// Pass the [tabChild] to render the tabs.
+/// Pass the [contentChild] to render the content for that tab.
+/// Pass the [sidenavChild] to render the side navigation panel.
+/// Pass the [statusBarChild] to render the status bar content.
+/// Pass the [sidenavIconsChild] to render the side icon bar.
 class DashboardLayout extends StatefulWidget {
   final Widget tabChild, contentChild, sidenavChild, statusBarChild, sidenavIconsChild;
 

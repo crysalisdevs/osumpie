@@ -12,6 +12,9 @@ import '../partials/widgets/error_msg.dart';
 import '../partials/widgets/loading_msg.dart';
 import '../partials/widgets/node_widget.dart';
 
+/// The receipe editor route which handles the receipe creating, saving, etc.
+/// 
+/// The [file] object must be passed to open it in receipe editor.
 class RecipeEditor extends StatefulWidget {
   final File file;
 
@@ -22,14 +25,22 @@ class RecipeEditor extends StatefulWidget {
 }
 
 class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderStateMixin {
+  /// All the widgets inside the receipe editor.
   List<Widget> _widgets = [];
-  AnimationController _runAnimationController;
+
+  /// All the available jobs that can be added.
   Map<String, Map<String, dynamic>> _availableJobBlocks = {};
+
+  /// The jobs who must be connected with lines are stored here.
   List<NodeBlock> selectedForLines = [];
+
+  /// Prevent from reloading the receipe editor when setStating.
   bool _reFuturelock = false;
-  final stackKey = GlobalKey();
+
+  AnimationController _runAnimationController;
   final scrollController = ScrollController();
 
+  /// The floating toolbar used to create and delete jobs.
   Widget get toolBar => Positioned(
       right: 10,
       child: SlideInDown(
@@ -58,14 +69,8 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                   else if (snapshot.hasError) return Icon(Icons.error);
                   return CircularProgressIndicator();
                 }),
-            // FloatingActionRowDivider(),
-            // FloatingActionButton(
-            //     onPressed: saveReceipeFile,
-            //     backgroundColor: Colors.transparent,
-            //     foregroundColor: Colors.white,
-            //     tooltip: 'Save',
-            //     child: Icon(Icons.point_of_sale)),
             FloatingActionRowDivider(),
+            // Delete button
             FloatingActionButton(
                 onPressed: () {},
                 backgroundColor: Colors.transparent,
@@ -73,6 +78,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                 tooltip: 'Delete Job',
                 child: Icon(Icons.delete)),
             FloatingActionRowDivider(),
+            // Run button
             FloatingActionButton(
                 onPressed: runProject,
                 backgroundColor: Colors.transparent,
@@ -85,26 +91,29 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           ],
         ),
       ));
-  void addJob(String value) {
+
+  /// Add a job into the receipe editor.
+  ///
+  /// The [name] of the job node.
+  void addJob(String name) {
     setState(() => _widgets.add(
-        NodeBlock(
-          top: 10,
-          left: 10,
-          width: _availableJobBlocks[value]['width'],
-          height: _availableJobBlocks[value]['height'],
-          title: value,
-          description: _availableJobBlocks[value]['description'],
-          properties: _availableJobBlocks[value]['properties'],
-          author: _availableJobBlocks[value]['author'],
-          myUuid: Uuid().v4(),
-          leftUuid: null,
-          rightUuid: null,
-          renderLinesCallback: renderLines,
-          nodeBlocks: selectedForLines,
-          saveReceipeFileCallback: saveReceipeFile,
-        ),
-      ));
-      saveReceipeFile();
+          NodeBlock(
+            top: 10,
+            left: 10,
+            width: _availableJobBlocks[name]['width'],
+            height: _availableJobBlocks[name]['height'],
+            title: name,
+            description: _availableJobBlocks[name]['description'],
+            properties: _availableJobBlocks[name]['properties'],
+            author: _availableJobBlocks[name]['author'],
+            myUuid: Uuid().v4(),
+            rightUuid: null,
+            renderLinesCallback: renderLines,
+            nodeBlocks: selectedForLines,
+            saveReceipeFileCallback: saveReceipeFile,
+          ),
+        ));
+    saveReceipeFile();
   }
 
   @override
@@ -129,7 +138,6 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
                 child: SizedBox(
                   height: 5000,
                   child: Stack(
-                    key: stackKey,
                     children: [toolBar]..addAll(snapshot.data),
                   ),
                 ),
@@ -141,7 +149,6 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         },
       );
 
-  // get the list of all the job extension paths
   @override
   void dispose() {
     _runAnimationController?.dispose();
@@ -168,6 +175,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
     return completer.future;
   }
 
+  /// List all the available jobs that can be added in to the receipe editor.
   Future<List<String>> listJobs() async {
     List<String> nodeTemplates = [];
     final extensions = await listExtensions();
@@ -182,6 +190,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
     return nodeTemplates;
   }
 
+  /// Load the receipe file into the receipe editor and prepare connection logic.
   Future<List<Widget>> loadReceipeFile() async {
     if (!_reFuturelock) {
       _reFuturelock = true;
@@ -219,6 +228,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
     return _widgets;
   }
 
+  /// Draw the connections between two jobs.
   void renderLines() {
     _widgets.removeWhere((widgetInside) => widgetInside is CustomPaint);
     if (selectedForLines.length % 2 == 0 && selectedForLines.length >= 2)
@@ -237,10 +247,10 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
           ),
         );
         selectedForLines[i].rightUuid = selectedForLines[i + 1].myUuid;
+        saveReceipeFile();
       }
   }
 
-  // save the node setup to a file
   void runProject() {
     if (_runAnimationController.isCompleted)
       _runAnimationController.reverse();
@@ -248,6 +258,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       _runAnimationController.forward();
   }
 
+  /// Save the receipe to the file.
   Future<void> saveReceipeFile() async {
     if (!await widget.file.exists()) await widget.file.create();
     var nodeBlocks = {};

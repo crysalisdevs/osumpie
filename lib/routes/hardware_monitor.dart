@@ -55,6 +55,9 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     );
   }
 
+  /// Returns the monitor record as a list view.
+  /// 
+  /// Pass the [controller] to hook up with the scrollbar.
   Widget buildMonitorList({@required ScrollController controller}) {
     return ListView(
       controller: controller,
