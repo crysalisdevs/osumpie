@@ -110,11 +110,7 @@ class NodeBlock extends StatefulWidget {
 }
 
 class _NodeBlockState extends State<NodeBlock> {
-  GlobalKey _key = GlobalKey();
-  double _xOff, _yOff;
-
-  bool isConnectedLeft = false;
-  bool isConnectedRight = false;
+  bool isConnectedLeft = false, isConnectedRight = false;
 
   // Node Editor
   Widget get buildNodeUi => Container(
@@ -122,99 +118,70 @@ class _NodeBlockState extends State<NodeBlock> {
         borderRadius: BorderRadius.circular(20.0),
         color: Colors.blueGrey[50],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onDoubleTap: () {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          CircleButton(
+            isConnected: isConnectedLeft,
+            onTap: () {
+              widget.nodeBlocks.add(widget);
+              widget.renderLinesCallback();
+            },
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleButton(
-                isConnected: isConnectedLeft,
-                onTap: () {
-                  widget.nodeBlocks.add(widget);
-                  widget.renderLinesCallback();
-                },
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.title,
-                    style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    widget.description,
-                    style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  Text(
-                    '@${widget.author}',
-                    style: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
+              Text(
+                widget.description,
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-              CircleButton(
-                isConnected: isConnectedRight,
-                onTap: () {
-                  widget.nodeBlocks.add(widget);
-                  widget.renderLinesCallback();
-                },
+              Text(
+                '@${widget.author}',
+                style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: 10.0,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ],
           ),
-        ),
+          CircleButton(
+            isConnected: isConnectedRight,
+            onTap: () {
+              widget.nodeBlocks.add(widget);
+              widget.renderLinesCallback();
+            },
+          ),
+        ],
       ));
 
   @override
-  Widget build(BuildContext context) => Positioned(
-        key: _key,
-        top: widget.top,
-        left: widget.left,
-        width: widget.width,
-        height: widget.height,
-        child: Draggable(
-          child: buildNodeUi,
-          feedback: Container(
-            width: widget.width,
-            height: widget.height,
-            child: buildNodeUi,
-          ),
-          childWhenDragging: Container(
-            width: widget.width,
-            height: widget.height,
-            child: buildNodeUi,
-          ),
-          onDragEnd: (drag) => setState(() {
-            widget.top = drag.offset.dy - _yOff;
-            widget.left = drag.offset.dx - _xOff;
-            widget.renderLinesCallback();
-          }),
-        ),
-      );
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_getRenderOffsets);
-    super.initState();
-  }
-
-  void _getRenderOffsets(_) {
-    final renderBoxWidget = _key.currentContext.findRenderObject() as RenderBox;
-    final offset = renderBoxWidget.localToGlobal(Offset.zero);
-
-    _yOff = offset.dy - widget.top;
-    _xOff = offset.dx - widget.left;
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: widget.top,
+      left: widget.left,
+      width: widget.width,
+      height: widget.height,
+      child: GestureDetector(
+        onPanUpdate: (details) => setState(() {
+          widget.left += details.delta.dx;
+          widget.top += details.delta.dy;
+        }),
+        onPanEnd: (details) => widget.renderLinesCallback(),
+        child: buildNodeUi,
+      ),
+    );
   }
 }

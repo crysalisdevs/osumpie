@@ -13,7 +13,7 @@ import '../partials/widgets/loading_msg.dart';
 import '../partials/widgets/node_widget.dart';
 
 /// The receipe editor route which handles the receipe creating, saving, etc.
-/// 
+///
 /// The [file] object must be passed to open it in receipe editor.
 class RecipeEditor extends StatefulWidget {
   final File file;
@@ -39,6 +39,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
 
   AnimationController _runAnimationController;
   final scrollController = ScrollController();
+  final scrollController2 = ScrollController();
 
   /// The floating toolbar used to create and delete jobs.
   Widget get toolBar => Positioned(
@@ -130,15 +131,25 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
               ],
             );
           else if (snapshot.hasData)
-            return SingleChildScrollView(
+            return Scrollbar(
               controller: scrollController,
-              child: Scrollbar(
+              isAlwaysShown: true,
+              child: SingleChildScrollView(
                 controller: scrollController,
-                isAlwaysShown: true,
-                child: SizedBox(
-                  height: 5000,
-                  child: Stack(
-                    children: [toolBar]..addAll(snapshot.data),
+                scrollDirection: Axis.horizontal,
+                child: Scrollbar(
+                  controller: scrollController2,
+                  isAlwaysShown: true,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    controller: scrollController2,
+                    child: SizedBox(
+                      height: 5000,
+                      width: 5000,
+                      child: Stack(
+                        children: [toolBar]..addAll(snapshot.data),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -168,7 +179,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   Future<List<FileSystemEntity>> listExtensions() {
     var files = <FileSystemEntity>[];
     var completer = Completer<List<FileSystemEntity>>();
-    var lister = Directory('extensions/').list(recursive: true);
+    var lister = Directory('bakecode-jobs/lib/stl/').list(recursive: true);
     lister.listen((file) => files.add(file),
         // should also register onError
         onDone: () => completer.complete(files));
