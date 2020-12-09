@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'node_widget.g.dart';
@@ -82,29 +83,35 @@ class NodeBlock extends StatefulWidget {
   @JsonKey(ignore: true)
   bool lockEditorPan;
 
-  NodeBlock(
-      {@required this.top,
-      @required this.left,
-      @required this.title,
-      @required this.author,
-      @required this.width,
-      @required this.height,
-      @required this.description,
-      @required this.myUuid,
-      @required this.properties,
-      @required this.rightUuid,
-      @required this.nodeBlocks,
-      @required this.renderLinesCallback,
-      @required this.saveReceipeFileCallback,
-      @required this.lockEditorPan});
+  @JsonKey(ignore: true)
+  StateSetter setStateRoot;
+
+  NodeBlock({
+    @required this.top,
+    @required this.left,
+    @required this.title,
+    @required this.author,
+    @required this.width,
+    @required this.height,
+    @required this.description,
+    @required this.myUuid,
+    @required this.properties,
+    @required this.rightUuid,
+    @required this.nodeBlocks,
+    @required this.renderLinesCallback,
+    @required this.saveReceipeFileCallback,
+    @required this.lockEditorPan,
+    @required this.setStateRoot,
+  });
 
   factory NodeBlock.fromJson(Map<String, dynamic> item, void Function() renderLinesCallback, List<NodeBlock> nodeBlocks,
-      void Function() saveReceipeFileCallback, bool lockEditorPan) {
+      void Function() saveReceipeFileCallback, bool lockEditorPan, StateSetter setStateRoot) {
     NodeBlock generated = _$NodeBlockFromJson(item);
     generated.renderLinesCallback = renderLinesCallback;
     generated.nodeBlocks = nodeBlocks;
     generated.saveReceipeFileCallback = saveReceipeFileCallback;
     generated.lockEditorPan = lockEditorPan;
+    generated.setStateRoot = setStateRoot;
     return generated;
   }
   Map<String, dynamic> toJson() => _$NodeBlockToJson(this);
@@ -178,17 +185,24 @@ class _NodeBlockState extends State<NodeBlock> {
       left: widget.left,
       width: widget.width,
       height: widget.height,
-      child: GestureDetector(
-        onTap: () => setState(() => widget.lockEditorPan = true),
-        onPanUpdate: (details) => setState(() {
-          widget.left += details.delta.dx;
-          widget.top += details.delta.dy;
-        }),
-        onPanEnd: (details) {
-          widget.renderLinesCallback();
-          setState(() => widget.lockEditorPan = true);
-        },
-        child: buildNodeUi,
+      child: MouseRegion(
+        cursor: widget.lockEditorPan ? SystemMouseCursors.click : SystemMouseCursors.grabbing,
+        child: GestureDetector(
+          // onVerticalDragUpdate: (details) => setState(() => widget.top += details.delta.dy),
+          // onHorizontalDragUpdate: (details) => setState(() => widget.left += details.delta.dx),
+          // onHorizontalDragEnd: (details) => widget.renderLinesCallback(),
+          // onVerticalDragEnd: (details) => widget.renderLinesCallback(),
+          onTapDown: (_) => widget.setStateRoot(() => widget.lockEditorPan = true),
+          onPanUpdate: (details) => setState(() {
+            widget.left += details.delta.dx;
+            widget.top += details.delta.dy;
+          }),
+          onPanEnd: (details) {
+            widget.renderLinesCallback();
+            widget.setStateRoot(() => widget.lockEditorPan = false);
+          },
+          child: buildNodeUi,
+        ),
       ),
     );
   }

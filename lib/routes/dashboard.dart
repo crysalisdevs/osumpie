@@ -19,17 +19,22 @@ class DashboardRoute extends StatefulWidget {
   _DashboardRouteState createState() => _DashboardRouteState();
 }
 
-class _DashboardRouteState extends State<DashboardRoute> {
+class _DashboardRouteState extends State<DashboardRoute> with AutomaticKeepAliveClientMixin {
   /// Contains the application's global settings.
   Settings _settings;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final menuKeys = menus.keys.toList();
+
     return DefaultTabController(
       length: osumTabs.length,
       child: Scaffold(
-        appBar: AppBar(title: Text("Osum Pie"), actions: [
+        appBar: AppBar(toolbarHeight: isDesktop ? 40.0 : null, title: Text("Osum Pie"), actions: [
           for (int i = 0; i < menus.length; i++)
             SlideInDown(
                 child: FlatButton.icon(
@@ -68,10 +73,10 @@ class _DashboardRouteState extends State<DashboardRoute> {
             children: [
               for (int i = 0; i < 5; i++)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  padding: isDesktop ? const EdgeInsets.fromLTRB(0, 0, 0, 12) : const EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: IconButton(
                     color: DynamicTheme.of(context).data.appBarTheme.iconTheme.color,
-                    icon: Icon(Icons.file_copy, size: 30),
+                    icon: Icon(Icons.file_copy, size: isDesktop ? 25.0 : 30.0),
                     onPressed: () {},
                   ),
                 )

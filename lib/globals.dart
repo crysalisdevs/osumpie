@@ -16,8 +16,6 @@ Map<String, List<Object>> menus = {
   "Help": [Icons.help, null],
 };
 
-Map<String, Object> osumTabs = {
-  "Receipe Editor": RecipeEditor(file: File('test.json')),
-};
+Map<String, Object> osumTabs = {};
 
 final isDesktop = Platform.isWindows || Platform.isLinux || Platform.isMacOS || kIsWeb;

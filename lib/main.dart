@@ -33,18 +33,19 @@ class OsumPie extends StatelessWidget {
               labelColor: (brightness == Brightness.dark) ? primaryColor : Colors.blueGrey,
             ),
             textTheme: TextTheme(headline5: TextStyle(color: Colors.white)),
+            iconTheme: isDesktop ? IconThemeData(size: 20) : null,
             appBarTheme: AppBarTheme(
-              iconTheme: IconThemeData(color: primaryColor),
+              iconTheme: IconThemeData(color: primaryColor, size: isDesktop ? 20.0 : null),
               textTheme: TextTheme(
                   headline6: GoogleFonts.openSans(
                       textStyle: TextStyle(
                 color: primaryColor,
-                fontSize: 25.0,
+                fontSize: isDesktop ? 18.0 : 25.0,
                 fontWeight: FontWeight.bold,
               ))),
               color: (brightness == Brightness.dark) ? Colors.black54 : Colors.white,
               shadowColor: (brightness == Brightness.dark) ? Colors.black54 : Colors.blueGrey[50],
-              elevation: 1.0,
+              elevation: 1,
             ),
             dividerColor: Colors.blueGrey[100],
             primaryColor: Colors.blue[800],

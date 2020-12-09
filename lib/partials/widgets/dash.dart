@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../globals.dart';
 import '../../partials/settings.dart';
 
 const sideNavBorderWidth = 10.0;
@@ -49,7 +50,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             left: 0,
             child: SlideInLeft(
               child: Container(
-                width: 55,
+                width: isDesktop ? 45 : 55,
                 decoration: BoxDecoration(
                     color: DynamicTheme.of(context).data.appBarTheme.color,
                     shape: BoxShape.rectangle,

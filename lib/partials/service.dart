@@ -1,6 +1,6 @@
 import 'package:bsi_dart/bsi_dart.dart';
 
-class OsumPieService extends Service {
+class OsumPieService extends BakeCodeService {
   /// The private generative constructor for singleton implementation.
   OsumPieService._();
 

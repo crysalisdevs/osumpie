@@ -20,11 +20,10 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
     a grid view. To work around this, the widgets are wrapped within two list views
     and share the same scroll controller for even scrolling.
   */
-  LinkedScrollControllerGroup _monitorStateScrollController;
-
   ScrollController _monitorStateScrollControllerLeft;
   ScrollController _monitorStateScrollControllerRight;
 
+  final _monitorStateScrollController = LinkedScrollControllerGroup();
   final _metrics = ["CPU", "GPU", "TEMP", "RAM", "ROM", "POWER"];
 
   @override
@@ -56,7 +55,7 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
   }
 
   /// Returns the monitor record as a list view.
-  /// 
+  ///
   /// Pass the [controller] to hook up with the scrollbar.
   Widget buildMonitorList({@required ScrollController controller}) {
     return ListView(
@@ -129,7 +128,6 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
 
   @override
   void dispose() {
-    _monitorStateScrollController = null; // No dispose() method, hopefully garbage collected.
     _monitorStateScrollControllerLeft?.dispose();
     _monitorStateScrollControllerRight?.dispose();
     super.dispose();
@@ -139,7 +137,6 @@ class _HardwareMonitorRouteState extends State<HardwareMonitorRoute> {
   @override
   void initState() {
     super.initState();
-    _monitorStateScrollController = LinkedScrollControllerGroup();
     _monitorStateScrollControllerLeft = _monitorStateScrollController.addAndGet();
     _monitorStateScrollControllerRight = _monitorStateScrollController.addAndGet();
   }

@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:floating_action_row/floating_action_row.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:osumpie/globals.dart';
 import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
@@ -27,7 +24,8 @@ class RecipeEditor extends StatefulWidget {
   _RecipeEditorState createState() => _RecipeEditorState();
 }
 
-class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderStateMixin {
+class _RecipeEditorState extends State<RecipeEditor>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   /// All the widgets inside the receipe editor.
   List<Widget> _widgets = [];
 
@@ -41,8 +39,10 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
   bool _reFuturelock = false;
 
   AnimationController _runAnimationController;
-  final scrollController = ScrollController();
-  final scrollController2 = ScrollController();
+
+  bool lockEditorPan = false;
+
+  TransformationController _transformationController;
 
   /// The floating toolbar used to create and delete jobs.
   Widget get toolBar => Positioned(
@@ -96,6 +96,9 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         ),
       ));
 
+  @override
+  bool get wantKeepAlive => true;
+
   /// Add a job into the receipe editor.
   ///
   /// The [name] of the job node.
@@ -116,63 +119,58 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
             nodeBlocks: selectedForLines,
             saveReceipeFileCallback: saveReceipeFile,
             lockEditorPan: lockEditorPan,
+            setStateRoot: setState,
           ),
         ));
     saveReceipeFile();
   }
 
-  bool lockEditorPan = false;
-
   @override
-  Widget build(BuildContext context) => FutureBuilder<List<Widget>>(
-        future: loadReceipeFile(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError || snapshot.data == null)
-            return Stack(
-              children: [
-                OsumPieErrorMsg(
-                  error: snapshot.error ?? 'No recipe? Add recipe block!',
-                ),
-                toolBar
-              ],
-            );
-          else if (snapshot.hasData)
-            // Disabling the panning when scroll feature in desktop as it is hard
-            // to pan node because it will pan the editor also.
-            return Scrollbar(
-              controller: scrollController,
-              isAlwaysShown: true,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                scrollDirection: Axis.horizontal,
-                physics: lockEditorPan ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
-                child: Scrollbar(
-                  controller: scrollController2,
-                  isAlwaysShown: true,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    controller: scrollController2,
-                    physics: lockEditorPan ? NeverScrollableScrollPhysics() : BouncingScrollPhysics(),
-                    child: SizedBox(
-                      height: 5000,
-                      width: 5000,
-                      child: Stack(
-                        children: [toolBar]..addAll(snapshot.data),
-                      ),
-                    ),
-                  ),
-                ),
+  Widget build(BuildContext context) {
+    super.build(context);
+    return FutureBuilder<List<Widget>>(
+      future: loadReceipeFile(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || snapshot.data == null)
+          return Stack(
+            children: [
+              OsumPieErrorMsg(
+                error: snapshot.error ?? 'No recipe? Add recipe block!',
               ),
-            );
-          return const OsumPieLoadingMsg(
-            loadingMsg: 'Loading receipe...',
+              toolBar
+            ],
           );
-        },
-      );
+        else if (snapshot.hasData)
+          // Disabling the panning when scroll feature in desktop as it is hard
+          // to pan node because it will pan the editor also.
+          return InteractiveViewer(
+            transformationController: _transformationController,
+            panEnabled: true,
+            scaleEnabled: true,
+            boundaryMargin: const EdgeInsets.all(5.0),
+            constrained: false,
+            child: ConstrainedBox(
+              constraints: BoxConstraints.expand(
+                height: 5000,
+                width: 5000,
+              ),
+              child: Stack(
+                children: [toolBar]..addAll(snapshot.data),
+              ),
+            ),
+          );
+        return const OsumPieLoadingMsg(
+          loadingMsg: 'Loading receipe...',
+        );
+      },
+    );
+  }
 
+  // get the json files load and include the job blocks when listing the jobs.
   @override
   void dispose() {
     _runAnimationController?.dispose();
+    _transformationController?.dispose();
     super.dispose();
   }
 
@@ -183,9 +181,9 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
+    _transformationController = TransformationController();
   }
 
-  // get the json files load and include the job blocks when listing the jobs.
   Future<List<FileSystemEntity>> listExtensions() {
     var files = <FileSystemEntity>[];
     var completer = Completer<List<FileSystemEntity>>();
@@ -222,7 +220,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
         try {
           Map<String, dynamic> nodes = jsonDecode(fileContents);
           nodes.forEach((uuid, nodeData) => _widgets.add(
-                NodeBlock.fromJson(nodeData, renderLines, selectedForLines, saveReceipeFile, lockEditorPan),
+                NodeBlock.fromJson(nodeData, renderLines, selectedForLines, saveReceipeFile, lockEditorPan, setState),
               ));
         } on FormatException catch (e) {
           if (e.message == 'Unexpected end of input')
@@ -272,6 +270,7 @@ class _RecipeEditorState extends State<RecipeEditor> with SingleTickerProviderSt
       }
   }
 
+  // To keep the tab content state alive.
   void runProject() {
     if (_runAnimationController.isCompleted)
       _runAnimationController.reverse();

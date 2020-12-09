@@ -10,7 +10,6 @@ import '../partials/widgets/loading_msg.dart';
 // NOTE: raw editor is deprecated use system default text/code editor instead.
 
 /// A raw file viewer widget which loads the file [filename].
-@deprecated
 class FileRawEditor extends StatefulWidget {
   final String filename;
 
@@ -20,12 +19,16 @@ class FileRawEditor extends StatefulWidget {
   _FileRawEditorState createState() => _FileRawEditorState();
 }
 
-class _FileRawEditorState extends State<FileRawEditor> {
-  TextEditingController _sourceTextController;
-  ScrollController _sourceScrollController;
+class _FileRawEditorState extends State<FileRawEditor> with AutomaticKeepAliveClientMixin {
+  final _sourceScrollController = ScrollController();
+  final _sourceTextController = TextEditingController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<String>(
         future: File(widget.filename).readAsString(),
         builder: (context, snapshot) {
@@ -60,12 +63,5 @@ class _FileRawEditorState extends State<FileRawEditor> {
     _sourceTextController?.dispose();
     _sourceScrollController?.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    _sourceTextController = TextEditingController();
-    _sourceScrollController = ScrollController();
-    super.initState();
   }
 }
