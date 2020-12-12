@@ -25,11 +25,11 @@ dependencies:
   shared_preferences: ^0.5.12+2
   linked_scroll_controller: ^0.1.2
 
-  bakecode_jobs:
-    path: bakecode-jobs/
+  bakecode:
+    git: git@github.com:crysalisdevs/bakecode.git
 
-  bsi_dart:
-    path: bsi-dart/
+  bsi:
+    git: git@github.com:crysalisdevs/bsi-dart.git
 
 dev_dependencies:
   flutter_test:

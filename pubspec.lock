@@ -29,12 +29,14 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.0-nullsafety.3"
-  bakecode_jobs:
+  bakecode:
     dependency: "direct main"
     description:
-      path: bakecode-jobs
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: f0d03c41c4b3a49200f711e9ef42cdfa09217e67
+      url: "git@github.com:crysalisdevs/bakecode.git"
+    source: git
     version: "0.1.0-alpha"
   boolean_selector:
     dependency: transitive
@@ -43,12 +45,14 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0-nullsafety.3"
-  bsi_dart:
+  bsi:
     dependency: "direct main"
     description:
-      path: bsi-dart
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: f7f985f9c4847fc6b95f4df066166d3097e5c527
+      url: "git@github.com:crysalisdevs/bsi-dart.git"
+    source: git
     version: "0.0.2-alpha"
   build:
     dependency: transitive
