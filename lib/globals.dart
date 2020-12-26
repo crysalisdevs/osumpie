@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'routes/hardware_monitor.dart';
-import 'routes/recipe_editor.dart';
 
 Brightness globalBrightness = Brightness.light;
 
